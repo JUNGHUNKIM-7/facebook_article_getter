@@ -1,6 +1,6 @@
 from typing import Optional, Union
-from sel.controller import FacebookController
-from bs.handler import DataHandler
+from src.sel.controller import FacebookController
+from src.bs.handler import DataHandler
 
 
 class Container:
@@ -24,20 +24,39 @@ class Container:
             raise Exception('No Data Found')
 
     @classmethod
-    def run_facebook(cls, instance: FacebookController, drag_count_or_infinite: Union[int, bool],
-                     root: str, file_name: str, kind: str, year: Optional[int] = None,
-                     search_keyword: Optional[str] = None) -> None:
+    def run_facebook(cls,
+                     instance: FacebookController,
+                     drag_count_or_infinite: Union[int, bool],
+                     root: str,
+                     file_name: str,
+                     kind: str,
+                     year: Optional[int] = None,
+                     search_keyword: Optional[str] = None,
+                     scrape_count: int = 1) -> None:
         try:
+            print(f"""
+                PERSON: {instance.person_name}
+                INFO: {instance.person_info}
+                YEAR: {year}
+                KEYWORD: {search_keyword}
+                SCRAP_COUNT: {scrape_count}
+                DRAG_STATUS: {drag_count_or_infinite}
+                """)
             instance.login()
             instance.search_person()
             instance.search_posts(search_keyword=search_keyword)
             instance.bottom_end(drag_count_or_infinite=drag_count_or_infinite)
-            instance.saved_file_by_moving(root=root, file_name=file_name, kind=kind)
-            instance.delete_all_cookies()
+            instance.saved_file_by_moving(root=root,
+                                          file_name=file_name,
+                                          kind=kind,
+                                          year=year,
+                                          search_keyword=search_keyword,
+                                          scrape_count=scrape_count)
         except Exception as e:
             raise e
         finally:
             # when debugging, close=False
+            # instance.delete_all_cookies()
             instance.close_browser(close=False)
 
     @classmethod
