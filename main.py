@@ -1,47 +1,33 @@
 from inputs import *
-from typing import Optional, Union
-from sel.controller import FacebookController
-from bs.handler import DataHandler
+from container import Container
 
-
-def make_ins(key: str, news_channel: Optional[str] = None, **kwargs) \
-        -> Union[FacebookController, DataHandler]:
-    if key == 'facebook':
-        obj = kwargs.get(key)
-        key_li = ['url', 'person_name', 'person_info']
-        url, person_name, person_info = [obj.get(key) for key in key_li]
-        return FacebookController(loc=url, person_name=person_name, person_info=person_info)
-
-    elif key == 'cnbc' or key == 'yh' or key == 'trade':
-        obj = kwargs.get(key)
-        if news_channel:
-            url = obj.get(news_channel)
-            return DataHandler(url=url)
-    else:
-        raise Exception('No Data Found')
-
-
-fb_ins1 = make_ins(key='facebook', **fb)
-news_ins1 = make_ins(key='yh', news_channel='world', **news)
-
-
-def fb_run() -> None:
-    try:
-        fb_ins1.login()
-        fb_ins1.search_person()
-        fb_ins1.search_posts(year=2021)
-        fb_ins1.bottom_end(count_or_infinite=2)
-        fb_ins1.saved_file_by_moving(file_name='oh')
-    except Exception as e:
-        raise e
-    finally:
-        fb_ins1.close_browser(close=False)
-
-
-def news_run():
-    pass
-
+# --------Debug----------
+# 1. Search keyword 버튼 클릭 문제
+# Element <div class="oajrlxb2 g5ia77u1 qu0x051f esr5mh6w e9989ue4 r7d6kgcz rq0escxv nhd2j8a9 nc684nl6 p7hjln8o kvgmc6g5 cxmmr5t8 oygrvhab hcukyx3x jb3vyjys rz4wbd8a qt6c0cv9 a8nywdso i1ao9s8h esuyzwwr f1sip0of lzcic4wl oo9gr5id gpro0wi8 lrazzd5p"> could not be scrolled into view
+# 2. 2020 이하 버튼 클릭 문제
+# no found any btn
+# --------Debug----------
 
 if __name__ == '__main__':
-    fb_run()
-    news_run()
+    with Container.make_instance(key='facebook', **fb) as fb_ins, \
+            Container.make_instance(key='yh', news_channel='world', **news) as news_ins, \
+            Container.switch_fb_run(run=True):
+        if not Container.run_fb:
+            try:
+                pass
+                # todo, 파일불러오기
+                # Container.extracting_keyword()
+                # Container.run_investing()
+                # Container.news_run()
+            except Exception as e:
+                print(e)
+        else:
+            try:
+                Container.run_facebook(instance=fb_ins, year=2020, drag_count_or_infinite=1, root='files',
+                                       file_name='oh',
+                                       kind='txt')
+                # Container.extracting_keyword()
+                # Container.run_investing()
+                # Container.news_run()
+            except Exception as e:
+                print(e)

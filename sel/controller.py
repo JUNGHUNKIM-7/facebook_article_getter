@@ -1,12 +1,14 @@
 import os
 import time
-from datetime import date
 from dotenv import load_dotenv
-from typing import Optional, List, Union
+from typing import Optional, Union
 
 from selenium import webdriver as driver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.remote.webelement import WebElement
+
+from files import FileManager
 
 
 class FacebookController(driver.Firefox):
@@ -42,10 +44,10 @@ class FacebookController(driver.Firefox):
     def login(self) -> None:
         self.get(self.loc)
         self.find_element_by_id('email').send_keys(self.__id)
-        time.sleep(0.5)
+        time.sleep(1)
 
         self.find_element_by_id('pass').send_keys(self.__password)
-        time.sleep(0.5)
+        time.sleep(1)
 
         btn = self.find_element_by_css_selector('button[type="submit"]')
         btn.click()
@@ -66,6 +68,7 @@ class FacebookController(driver.Firefox):
             else:
                 raise NoSuchElementException
 
+    # if blocked
     def page_refresh(self) -> None:
         btn = self.find_element_by_css_selector('div[aria-label="페이지 새로 고침"]')
         btn.click()
@@ -79,18 +82,18 @@ class FacebookController(driver.Firefox):
                 time.sleep(1)
 
                 switch = self.find_element_by_css_selector('input[aria-label="최근 게시물"]')
-                time.sleep(1)
                 switch.click()
+                time.sleep(1)
 
                 divs = self.find_elements_by_css_selector('div[aria-haspopup="listbox"]')[0]
                 divs.click()
-                time.sleep(1)
+                time.sleep(2)
 
                 options = self.find_elements_by_css_selector('div[role="option"]')
                 for option in options:
                     if f'{year}년' == option.get_attribute('innerText').strip():
                         option.click()
-                        time.sleep(1)
+                        time.sleep(2)
                         break
                     else:
                         raise Exception("Not Found AnyOption")
@@ -100,14 +103,14 @@ class FacebookController(driver.Firefox):
             def search_latest_with_sub_keyword() -> None:
                 btn = self.find_element_by_css_selector(f'div[aria-label="{self.person_name}님의 게시물 검색"]')
                 btn.click()
-                time.sleep(0.5)
+                time.sleep(1)
 
                 input_field = self.find_element_by_css_selector(
                     f'input[aria-label="{self.person_name}님의 게시물, 사진 및 태그에서 검색"]')
                 input_field.send_keys(search_keyword)
                 input_field.send_keys(Keys.ENTER)
 
-                time.sleep(0.5)
+                time.sleep(1)
                 wrapper = self.find_elements_by_class_name('dbvibxzo')[1]
                 div = wrapper.find_elements_by_class_name('qzhwtbm6')[1]
                 switch = div.find_element_by_tag_name('input')
@@ -118,7 +121,7 @@ class FacebookController(driver.Firefox):
             def see_latest_all() -> None:
                 a = self.find_element_by_css_selector('a[href^="/search/posts"]')
                 a.click()
-                time.sleep(0.5)
+                time.sleep(1)
 
                 switch = self.find_element_by_css_selector('input[aria-label="최근 게시물"]')
                 switch.click()
@@ -126,46 +129,21 @@ class FacebookController(driver.Firefox):
             see_latest_all()
 
     # 스크롤 가능 elem 수 결정 남.
-    def bottom_end(self, count_or_infinite: Union[int, bool] = 1):
+    def bottom_end(self, drag_count_or_infinite: Union[int, bool] = 1):
         # default : 3~4 ea
         # key_END 1 time => btn(2~3?) * count_or_infinite
-        if count_or_infinite is False:
-            for _ in range(count_or_infinite):
+        if drag_count_or_infinite is not bool:
+            for _ in range(drag_count_or_infinite):
                 self.find_element_by_tag_name('body').send_keys(Keys.END)
                 time.sleep(1)
-
-            self.find_element_by_tag_name('body').send_keys(Keys.HOME)
+            # todo, drag_count is bool, while loop
             # todo 바닥찍기
 
-    def get_txt(self, i: int, wrapper, post_date, file_name: str):
-        def make_file(idx: int, articles: List[str]):
-            with open(f'{idx}_{file_name}_{str(date.today())}.txt', 'w', encoding='utf-8') as f:
-                for article in articles:
-                    f.write(f'{article}\n')
+            self.find_element_by_tag_name('body').send_keys(Keys.HOME)
+        else:
+            pass
 
-        try:
-            article_list = []
-            divs = wrapper.find_elements_by_css_selector('div[style="text-align: start;"]')
-            if len(divs) != 0:
-                article_list.append(post_date.get_attribute('innerText').strip())
-                for div in divs:
-                    a = div.find_elements_by_css_selector('a[role="link"]')
-                    if len(a) == 0:
-                        article_list.append(div.get_attribute('innerHTML').strip())
-                        time.sleep(0.5)
-                    else:
-                        if len(div.find_elements_by_tag_name('a')) != 0:
-                            article_list.append(
-                                div.find_element_by_tag_name('a').get_attribute('innerHTML').strip())
-                            continue
-                        article_list.append(post_date.get_attribute('innerHTML').strip())
-                        time.sleep(0.5)
-            make_file(i + 1, article_list)  # 5ea
-
-        except Exception as e:
-            print(e)
-
-    def saved_file_by_moving(self, file_name: str) -> None:
+    def saved_file_by_moving(self, root: str, file_name: str, kind: str) -> None:
         feed = self.find_element_by_css_selector('div[role="feed"]')
         wrappers = feed.find_elements_by_css_selector('div[data-ad-comet-preview="message"]')
         links = feed.find_elements_by_css_selector('a[href^="https://www.facebook.com/"]')
@@ -173,6 +151,7 @@ class FacebookController(driver.Firefox):
 
         # todo fix post_date!
         try:
+            time.sleep(2)
             print(f'{len(wrappers)} is Waiting')  # 1 wrapper = 1 btn
 
             for (i, wrapper), post_date in zip(enumerate(wrappers), links):  # each Wrapper
@@ -196,11 +175,35 @@ class FacebookController(driver.Firefox):
 
                 # parsing and save files
                 print(f'Start Scraping {i + 1}')
-                self.get_txt(i=i, wrapper=wrapper, post_date=post_date, file_name=file_name)
+                self.get_data_as_file(i=i, wrapper=wrapper, post_date=post_date, root=root, file_name=file_name,
+                                      kind=kind)
                 print(f'Completed: {i + 1}')
 
-            print(f'{len(wrappers) - missing_btn}ea are totally saved.')
+            print(f'{len(wrappers) - missing_btn} files are totally saved.')
+        except Exception as e:
+            print(e)
 
+    def get_data_as_file(self, i: int, wrapper: WebElement, post_date: WebElement, root: str, file_name: str,
+                         kind: str):
+        try:
+            article_list = []
+            divs = wrapper.find_elements_by_css_selector('div[style="text-align: start;"]')
+            if len(divs) != 0:
+                article_list.append(post_date.get_attribute('innerText').strip())
+                for div in divs:
+                    time.sleep(1)
+                    a = div.find_elements_by_css_selector('a[role="link"]')
+                    if len(a) == 0:
+                        article_list.append(div.get_attribute('innerHTML').strip())
+                    else:
+                        if len(div.find_elements_by_tag_name('a')) != 0:
+                            article_list.append(
+                                div.find_element_by_tag_name('a').get_attribute('innerHTML').strip())
+                            continue
+                        article_list.append(post_date.get_attribute('innerHTML').strip())
 
+            FileManager.make_file(articles=article_list,
+                                  root=root, file_name=file_name, kind=kind,
+                                  idx=i + 1)
         except Exception as e:
             print(e)
