@@ -1,6 +1,6 @@
 import os
 import time
-from typing import List, Optional, Union, Callable, Tuple
+from typing import List, Optional, Union
 from datetime import date
 
 from selenium.webdriver.remote.webelement import WebElement

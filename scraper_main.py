@@ -1,6 +1,6 @@
-from inputs import *
-from container import Container
-from src.files import FileManager
+from scraper_inputs import *
+from src.scraper.container import Container
+from src.scraper.convert_files import FileManager
 
 # ------Debug-------
 # 2. 2020 이하 버튼 클릭 문제

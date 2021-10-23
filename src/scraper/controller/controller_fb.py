@@ -11,7 +11,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from src.files import FileManager
+from src.scraper.convert_files import FileManager
 
 
 # todo search_keyword 작동
@@ -21,14 +21,12 @@ class FacebookController(driver.Firefox):
     load_dotenv()
 
     def __init__(self, loc: str, person_name: str, person_info: Optional[str] = None,
-                 driver_path: str = r'data_getter\src\geckodriver.exe',
+                 driver_path: str = r'data_getter\src\scraper\geckodriver.exe',
                  close: bool = False):
-        # settings
         os.environ["PATH"] += driver_path
         # options = driver.FirefoxOptions()
         # options.headless()
 
-        # vars
         self.__id = os.getenv('FB_ID')
         self.__password = os.getenv('FB_PASS')
         self.loc = loc
@@ -83,7 +81,6 @@ class FacebookController(driver.Firefox):
             else:
                 raise NoSuchElementException
 
-    # if blocked
     def page_refresh(self) -> None:
         btn = self.find_element(By.CSS_SELECTOR, 'div[aria-label="페이지 새로 고침"]')
         btn.click()

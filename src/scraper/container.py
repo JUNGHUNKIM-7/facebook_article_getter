@@ -1,6 +1,6 @@
 from typing import Optional, Union
-from src.sel.controller import FacebookController
-from src.bs.handler import DataHandler
+from src.scraper.controller.controller_fb import FacebookController
+from src.scraper.controller.controller_soup import DataHandler
 
 
 # todo news_run func with soup
