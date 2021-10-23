@@ -1,14 +1,20 @@
 import os
 import time
-from dotenv import load_dotenv
 from typing import Optional, Union, List, Tuple
 
+from dotenv import load_dotenv
 from selenium import webdriver as driver
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from src.files import FileManager
+
+
+# todo search_keyword 작동
 
 
 class FacebookController(driver.Firefox):
@@ -23,7 +29,7 @@ class FacebookController(driver.Firefox):
         # options.headless()
 
         # vars
-        self.__id = os.getenv('FB_BACK')
+        self.__id = os.getenv('FB_ID')
         self.__password = os.getenv('FB_PASS')
         self.loc = loc
         self.person_name = person_name
@@ -34,6 +40,16 @@ class FacebookController(driver.Firefox):
         self.implicitly_wait(5)  # default 8
         self.maximize_window()
 
+    @classmethod
+    def wrapper_generator(cls, web_elements: List[WebElement], dates: Optional[List[WebElement]] = None) \
+            -> Union[Tuple[int, WebElement, WebElement], Tuple[int, WebElement]]:
+        if dates:
+            for (i, wrapper_elem), date in zip(enumerate(web_elements), dates):
+                yield i, wrapper_elem, date
+        else:
+            for i, wrapper_elem in enumerate(web_elements):
+                yield i, wrapper_elem
+
     def close_browser(self, close: bool = False) -> None:
         self.close = close
         if self.close is True:
@@ -42,22 +58,22 @@ class FacebookController(driver.Firefox):
 
     def login(self) -> None:
         self.get(self.loc)
-        self.find_element_by_id('email').send_keys(self.__id)
+        self.find_element(By.ID, 'email').send_keys(self.__id)
         time.sleep(1)
 
-        self.find_element_by_id('pass').send_keys(self.__password)
+        self.find_element(By.ID, 'pass').send_keys(self.__password)
         time.sleep(1)
 
-        btn = self.find_element_by_css_selector('button[type="submit"]')
+        btn = self.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
         btn.click()
 
     def search_person(self) -> None:
-        search_bar = self.find_element_by_css_selector('input[spellcheck="false"]')
+        search_bar = self.find_element(By.CSS_SELECTOR, 'input[spellcheck="false"]')
         search_bar.click()
         search_bar.send_keys(self.person_name)
         time.sleep(2)
 
-        spans = self.find_elements_by_class_name('ojkyduve')
+        spans = self.find_elements(By.CLASS_NAME, 'ojkyduve')
 
         for span in spans:
             cond = span.get_attribute('innerHTML').strip()
@@ -69,26 +85,26 @@ class FacebookController(driver.Firefox):
 
     # if blocked
     def page_refresh(self) -> None:
-        btn = self.find_element_by_css_selector('div[aria-label="페이지 새로 고침"]')
+        btn = self.find_element(By.CSS_SELECTOR, 'div[aria-label="페이지 새로 고침"]')
         btn.click()
         time.sleep(1)
 
     def search_posts(self, year: Optional[int] = None, search_keyword: Optional[str] = None) -> None:
         if year and search_keyword is None:
             def see_by_year() -> None:
-                a = self.find_element_by_css_selector('a[href^="/search/posts"]')
+                a = self.find_element(By.CSS_SELECTOR, 'a[href^="/search/posts"]')
                 a.click()
                 time.sleep(1)
 
-                switch = self.find_element_by_css_selector('input[aria-label="최근 게시물"]')
+                switch = self.find_element(By.CSS_SELECTOR, 'input[aria-label="최근 게시물"]')
                 switch.click()
                 time.sleep(1)
 
-                divs = self.find_elements_by_css_selector('div[aria-haspopup="listbox"]')[0]
+                divs = self.find_elements(By.CSS_SELECTOR, 'div[aria-haspopup="listbox"]')[0]
                 divs.click()
                 time.sleep(2)
 
-                options = self.find_elements_by_css_selector('div[role="option"]')
+                options = self.find_elements(By.CSS_SELECTOR, 'div[role="option"]')
                 for option in options:
                     if f'{year}년' == option.get_attribute('innerText').strip():
                         option.click()
@@ -100,48 +116,46 @@ class FacebookController(driver.Firefox):
             see_by_year()
         elif year is None and search_keyword:
             def search_latest_with_sub_keyword() -> None:
-                btn = self.find_element_by_css_selector(f'div[aria-label="{self.person_name}님의 게시물 검색"]')
+                btn = self.find_element(By.CSS_SELECTOR, 'div[aria-label="{self.person_name}님의 게시물 검색"]')
                 btn.click()
                 time.sleep(1)
 
-                input_field = self.find_element_by_css_selector(
-                    f'input[aria-label="{self.person_name}님의 게시물, 사진 및 태그에서 검색"]')
+                input_field = self.find_element(By.CSS_SELECTOR,
+                                                f'input[aria-label="{self.person_name}님의 게시물, 사진 및 태그에서 검색"]')
                 input_field.send_keys(search_keyword)
                 input_field.send_keys(Keys.ENTER)
 
                 time.sleep(1)
-                wrapper = self.find_elements_by_class_name('dbvibxzo')[1]
-                div = wrapper.find_elements_by_class_name('qzhwtbm6')[1]
-                switch = div.find_element_by_tag_name('input')
+                wrapper = self.find_elements(By.CLASS_NAME, 'dbvibxzo')[1]
+                div = wrapper.find_elements(By.CLASS_NAME, 'qzhwtbm6')[1]
+                switch = div.find_element(By.TAG_NAME, 'input')
                 switch.click()
 
             search_latest_with_sub_keyword()
         else:
             def see_latest_all() -> None:
-                a = self.find_element_by_css_selector('a[href^="/search/posts"]')
+                a = self.find_element(By.CSS_SELECTOR, 'a[href^="/search/posts"]')
                 a.click()
                 time.sleep(1)
 
-                switch = self.find_element_by_css_selector('input[aria-label="최근 게시물"]')
+                switch = self.find_element(By.CSS_SELECTOR, 'input[aria-label="최근 게시물"]')
                 switch.click()
 
             see_latest_all()
 
-    # 스크롤 가능 elem 수 결정 남.
-    def bottom_end(self, drag_count_or_infinite: Union[int, bool] = 1):
-        # default : 3~4 ea
-        # key_END 1 time => btn(2~3?) * count_or_infinite
+    def bottom_end(self, drag_count_or_infinite: Union[int, bool]):
         if drag_count_or_infinite is not bool:
             for _ in range(drag_count_or_infinite):
-                time.sleep(2)
-                self.find_element_by_tag_name('body').send_keys(Keys.END)
-            # todo, drag_count is bool, while loop
-            # todo 바닥찍기
-
-            self.find_element_by_tag_name('body').send_keys(Keys.HOME)
+                time.sleep(1)
+                self.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
+                time.sleep(1.5)
+            self.find_element(By.TAG_NAME, 'body').send_keys(Keys.HOME)
         else:
-
             pass
+            # curr_y = 0
+            # while True:
+            #     self.position_to_middle(element=curr_y)
+            #     time.sleep(1.5)
 
     def position_to_middle(self, element: WebElement) -> None:
         desired_y = (element.size['height'] / 2) + element.location['y']
@@ -151,104 +165,105 @@ class FacebookController(driver.Firefox):
         self.execute_script("window.scrollBy(0, arguments[0]);", scroll_y_by)
         time.sleep(2)
 
-    def wrapper_gen(self, web_elements: List[WebElement], dates: Optional[List[WebElement]] = None) \
-            -> Union[Tuple[int, WebElement, WebElement], Tuple[int, WebElement]]:
-        if dates:
-            for (i, wrapper_elem), date in zip(enumerate(web_elements), dates):
-                yield i, wrapper_elem, date
-        else:
-            for i, wrapper_elem in enumerate(web_elements):
-                yield i, wrapper_elem
-
     def saved_file_by_moving(self,
-                             root: str,
                              file_name: str,
                              kind: str,
+                             scrape_count: int = 1,
                              year: Optional[int] = None,
                              search_keyword: Optional[str] = None,
-                             scrape_count: int = 1) -> None:
-        feed = self.find_element_by_css_selector('div[role="feed"]')
+                             ) -> None:
+        feed = self.find_element(By.CSS_SELECTOR, 'div[role="feed"]')
 
         try:
             time.sleep(2)
             if year and not search_keyword:
-                wrappers = feed.find_elements_by_css_selector('div[data-ad-comet-preview="message"]')
-                links = feed.find_elements_by_css_selector('a[href^="https://www.facebook.com/"]')
+                wrappers = feed.find_elements(By.CSS_SELECTOR, 'div[data-ad-comet-preview="message"]')
+                links = feed.find_elements(By.CSS_SELECTOR, 'a[aria-label*="일"]')
                 missing_btn = 0
 
                 # generator
-                year_wrapper_gen = self.wrapper_gen(web_elements=wrappers, dates=links)
+                year_wrapper_gen = FacebookController.wrapper_generator(web_elements=wrappers, dates=links)
+                if scrape_count >= 1:
+                    for _ in range(scrape_count):
+                        i, wrapper, post_date = next(year_wrapper_gen)
+                        print(f"Wrapper {i + 1} is reading data")
 
-                for _ in range(scrape_count):
-                    i, wrapper, post_date = next(year_wrapper_gen)
-                    print(f"Wrapper {i + 1} is reading data")
+                        # moving
+                        self.position_to_middle(element=wrapper)
 
-                    # moving
-                    self.position_to_middle(element=wrapper)
+                        # see more btn click
+                        button_check = len(wrapper.find_elements(By.CSS_SELECTOR, 'div[role="button"]'))
 
-                    # see more btn click
-                    button_check = len(wrapper.find_elements_by_css_selector('div[role="button"]'))
-                    if button_check == 0:
-                        missing_btn += 1
-                        continue
-                    else:  # button_check > 0
-                        btn = wrapper.find_element_by_css_selector('div[role="button"]')
-                        btn.click()
-                        time.sleep(1.5)
+                        if button_check == 0:
+                            missing_btn += 1
+                            continue
+                        else:
+                            btn = wrapper.find_element(By.CSS_SELECTOR, 'div[role="button"]')
+                            btn.click()
+                            time.sleep(1.5)
 
-                    # parsing and save files
-                    print(f'Start Scraping {i + 1}')
-                    # todo fix post_date!
-                    FileManager.get_data_as_file(i=i,
-                                                 web_elems_or_data_list=wrapper,
-                                                 post_date=post_date,
-                                                 root=root,
-                                                 file_name=file_name,
-                                                 kind=kind)
-                    print(f'Completed: {i + 1}')
-
+                        # parsing and save files
+                        print(f'Start Scraping {i + 1}')
+                        FileManager.get_data_as_file(i=i,
+                                                     web_elems_or_data_list=wrapper,
+                                                     post_date=post_date,
+                                                     file_name=file_name,
+                                                     kind=kind)
+                        print(f'Completed: {i + 1}')
+                else:
+                    raise Exception('Scrape Count should be same or more at least a elem')
                 print(f'Wrapper: {scrape_count} are totally saved, MissingBtn:{missing_btn}')
+
             elif not year and search_keyword:
-                wrappers = feed.find_elements_by_css_selector('div[role="article"]')
-                keyword_wrapper_gen = self.wrapper_gen(web_elements=wrappers)
+                wrappers = self.find_elements(By.CSS_SELECTOR, 'div[role="article"]')
+                keyword_wrapper_gen = FacebookController.wrapper_generator(web_elements=wrappers)
 
-                for _ in range(scrape_count):  # each wrapper
-                    i, wrapper = next(keyword_wrapper_gen)
-                    link = wrapper.find_element_by_css_selector('a[role="link"]')
-                    print(f"Wrapper {i + 1} is reading data")
+                if scrape_count >= 1:
+                    for _ in range(scrape_count):  # each wrapper
+                        i, wrapper = next(keyword_wrapper_gen)
+                        print(f"Wrapper {i + 1} is reading data")
 
-                    # moving
-                    self.position_to_middle(element=wrapper)
+                        # moving
+                        self.position_to_middle(element=wrapper)
 
-                    link.click()
-                    time.sleep(1)
+                        if len(wrapper.find_elements(By.CSS_SELECTOR, 'a[href*="posts"]')) == 0:
+                            continue
+                        else:
+                            WebDriverWait(self, 10).until(
+                                EC.presence_of_element_located((By.CSS_SELECTOR, 'a[href*="posts"]')))
 
-                    # handling pop up
-                    big_wrapper = self.find_element_by_css_selector(
-                        'div[style="border-radius: max(0px, min(8px, -999900% - 39996px + 999900vw)) / 8px;"]')
-                    # area-label 중 : 을 포함하는 태그.
-                    # document.querySelectorAll('a[aria-label*=":"]')
-                    post_date = big_wrapper.find_element_by_css_selector('a[aria-label*=":"]')
-                    posts = big_wrapper.find_elements_by_css_selector('div[style="text-align: start;"]')
+                            link = wrapper.find_element(By.CSS_SELECTOR, 'a[href*="posts"]').get_attribute(
+                                'href').strip()
+                            self.get(link)
+                            time.sleep(2)
 
-                    data = [post_date + "\n"]
-                    for post in posts:
-                        data.append(post.get_attribute('innerHTML').strip())
+                            # handling pop up
+                            big_wrapper = self.find_element(By.CSS_SELECTOR, 'div[aria-posinset="1"]')
+                            post_date = big_wrapper.find_element(By.CSS_SELECTOR, 'a[href*="posts"]')
+                            date = post_date.get_attribute('innerHTML').strip()
 
-                    # parsing and save files
-                    print(f'Start Scraping {i + 1}')
-                    FileManager.get_data_as_file(i=i,
-                                                 web_elems_or_data_list=data,
-                                                 post_date=post_date,
-                                                 root=root,
-                                                 file_name=file_name,
-                                                 kind=kind)
-                    print(f'Completed: {i + 1}')
+                            # data obj
+                            data = []
+                            posts = big_wrapper.find_elements(By.CSS_SELECTOR, 'div[style="text-align: start;"]')
+                            for post in posts:
+                                data.append(post.get_attribute('innerHTML').strip())
 
-                    # out
-                    self.back()
-                    time.sleep(2)
-                print(f'{len(wrappers)} files are totally saved.')
+                            # parsing and save files
+                            print(f'Start Scraping {i + 1}')
+                            FileManager.get_data_as_file(i=i,
+                                                         web_elems_or_data_list=data,
+                                                         post_date=date,
+                                                         file_name=file_name,
+                                                         kind=kind)
+                            print(f'Completed: {i + 1}')
+
+                            # out
+                            self.back()
+                            time.sleep(1)
+                else:
+                    raise Exception('Scrape Count should be same or more at least a elem')
+                print(f'Wrapper: {scrape_count} are totally saved')
+
             else:
                 raise Exception("Year or Search should be passed to filter posts")
         except Exception as e:

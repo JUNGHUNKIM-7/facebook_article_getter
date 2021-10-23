@@ -3,8 +3,13 @@ from src.sel.controller import FacebookController
 from src.bs.handler import DataHandler
 
 
+# todo news_run func with soup
+
 class Container:
     run_fb = False
+
+    def __enter__(self):
+        return Container.run_fb
 
     @classmethod
     def make_instance(cls, key: str, news_channel: Optional[str] = None, **kwargs) \
@@ -27,7 +32,6 @@ class Container:
     def run_facebook(cls,
                      instance: FacebookController,
                      drag_count_or_infinite: Union[int, bool],
-                     root: str,
                      file_name: str,
                      kind: str,
                      year: Optional[int] = None,
@@ -46,12 +50,12 @@ class Container:
             instance.search_person()
             instance.search_posts(search_keyword=search_keyword)
             instance.bottom_end(drag_count_or_infinite=drag_count_or_infinite)
-            instance.saved_file_by_moving(root=root,
-                                          file_name=file_name,
-                                          kind=kind,
-                                          year=year,
-                                          search_keyword=search_keyword,
-                                          scrape_count=scrape_count)
+            instance.saved_file_by_moving(
+                file_name=file_name,
+                kind=kind,
+                scrape_count=scrape_count,
+                year=year,
+                search_keyword=search_keyword)
         except Exception as e:
             raise e
         finally:
@@ -70,14 +74,13 @@ class Container:
             return Container.run_fb
 
     @classmethod
-    def extracting_keyword(cls, file_dir: str):
+    def extracting_keyword(cls):
         pass
 
     @classmethod
-    def run_investing(cls, instance: DataHandler):
+    def run_investing(cls):
         pass
 
     @classmethod
-    # news run with bs
-    def news_run(cls, instance: DataHandler):
+    def news_run(cls):
         pass
