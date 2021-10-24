@@ -11,7 +11,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from src.scraper.convert_files import FileManager
+from file_controller import FileManager
 
 
 # todo search_keyword 작동
@@ -20,12 +20,13 @@ from src.scraper.convert_files import FileManager
 class FacebookController(driver.Firefox):
     load_dotenv()
 
+    HEADLESS = False
+    HEADLESS_ON = driver.FirefoxOptions().headless
+
     def __init__(self, loc: str, person_name: str, person_info: Optional[str] = None,
-                 driver_path: str = r'data_getter\src\scraper\geckodriver.exe',
+                 driver_path: str = r'data_getter\geckodriver.exe',
                  close: bool = False):
         os.environ["PATH"] += driver_path
-        # options = driver.FirefoxOptions()
-        # options.headless()
 
         self.__id = os.getenv('FB_ID')
         self.__password = os.getenv('FB_PASS')
@@ -33,9 +34,13 @@ class FacebookController(driver.Firefox):
         self.person_name = person_name
         self.person_info = person_info
         self.close = close
-        super(FacebookController, self).__init__()
+        self.__headless = FacebookController.HEADLESS
+        if self.__headless:
+            super(FacebookController, self).__init__(FacebookController.HEADLESS_ON)
+        else:
+            super(FacebookController, self).__init__()
 
-        self.implicitly_wait(5)  # default 8
+        self.implicitly_wait(5)
         self.maximize_window()
 
     @classmethod
@@ -151,10 +156,10 @@ class FacebookController(driver.Firefox):
             pass
             # curr_y = 0
             # while True:
-            #     self.position_to_middle(element=curr_y)
+            #     self.position_to_base(element=curr_y)
             #     time.sleep(1.5)
 
-    def position_to_middle(self, element: WebElement) -> None:
+    def position_to_base(self, element: WebElement) -> None:
         desired_y = (element.size['height'] / 2) + element.location['y']
         current_y = (self.execute_script('return window.innerHeight') / 2) + self.execute_script(
             'return window.pageYOffset')
@@ -186,7 +191,7 @@ class FacebookController(driver.Firefox):
                         print(f"Wrapper {i + 1} is reading data")
 
                         # moving
-                        self.position_to_middle(element=wrapper)
+                        self.position_to_base(element=wrapper)
 
                         # see more btn click
                         button_check = len(wrapper.find_elements(By.CSS_SELECTOR, 'div[role="button"]'))
@@ -221,7 +226,7 @@ class FacebookController(driver.Firefox):
                         print(f"Wrapper {i + 1} is reading data")
 
                         # moving
-                        self.position_to_middle(element=wrapper)
+                        self.position_to_base(element=wrapper)
 
                         if len(wrapper.find_elements(By.CSS_SELECTOR, 'a[href*="posts"]')) == 0:
                             continue

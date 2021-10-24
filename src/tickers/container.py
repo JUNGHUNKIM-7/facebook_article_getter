@@ -1,53 +1,49 @@
-from datetime import date, datetime
-from typing import List, Union
+import time
+from typing import List, Dict, Tuple, Optional
+from datetime import date
+import pandas as pd
+from pandas import DataFrame
+import pandas_datareader as pdr
+
+from file_controller import FileManager
+from src.tickers.timedel import TimeContainer
 
 
-class Container:
-    def __init__(
-        self,
-        tickers: Union[List[str], None],
-        sdate: Union[date, datetime],
-        edate: Union[date, datetime] = datetime.now().date(),
-    ) -> None:
+class TickerContainer:
+    PARSE_TICKER = False
 
-        if (
-            not isinstance(tickers, list)
-            or not isinstance(sdate, date)
-            or isinstance(edate, date)
-        ):
-            raise TypeError("Check Your data")
+    @classmethod
+    def parse_ticker_switch(cls, on: Optional[bool] = None):
+        TickerContainer.PARSE_TICKER = on
 
-        self.__tickers = tickers
-
-        if (len(str(sdate)) + len(str(edate))) < 20:
-            raise NotImplementedError("Enter Correct Date")
-        else:
-            self.__sdate = sdate
-            self.__edate = edate
+    def __init__(self, source: str, ticker_li: List[str], time: Dict[str, str]):
+        self.source = source
+        self.__ticker_li = ticker_li
+        self.__start = TimeContainer(time).start
+        self.__end = TimeContainer(time).end
+        self.__date_string = TimeContainer.date_string
 
     @property
-    def tickers(self) -> Union[List[str], str, None]:
-        return self.__tickers
-
-    @property
-    def sdate(self) -> Union[date, datetime, str]:
-        return self.__sdate
-
-    @property
-    def edate(self) -> Union[date, datetime, str]:
-        return self.__edate
+    def tickers(self) -> List[str]:
+        return self.__ticker_li
 
     @tickers.setter
-    def tickers(self, tickerList: str) -> None:
-        self.__tickers = tickerList
+    def tickers(self, other_li: List[str]) -> None:
+        self.__ticker_li = other_li
 
-    @sdate.setter
-    def sdate(self, otherSdate: str) -> None:
-        self.__sdate = otherSdate
+    @property
+    def time_data(self) -> Tuple[date, date]:
+        return self.__start, self.__end
 
-    @edate.setter
-    def edate(self, otherEdate: str) -> None:
-        self.__edate = otherEdate
+    @time_data.setter
+    def time_data(self, other_dict: Dict[str, str]) -> None:
+        TimeContainer(other_dict)
 
-    def __str__(self) -> str:
-        return f"{self.__tickers} : START: {self.__sdate} - END: {self.__edate}"
+    def save_to_csv(self) -> None:
+        file_loc = FileManager.get_save_path('data_getter\\files')
+        for ticker in self.__ticker_li:
+            df = pdr.DataReader(ticker, self.source, self.__start, self.__end)
+            time.sleep(1)
+            df: DataFrame = pd.DataFrame(df)
+            df.to_csv(fr'{file_loc}\{ticker}_{str(self.__start)}_{str(self.__end)}')
+            print(f'download {ticker} -{self.__start} | {self.__date_string} | +{self.__end} done')

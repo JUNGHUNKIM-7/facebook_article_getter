@@ -6,14 +6,21 @@ from datetime import date
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 
-from date import return_delta
+from src.scraper.date import return_delta
 
 
 # todo
 # read files 함수
 
-
 class FileManager:
+    @classmethod
+    def get_save_path(cls, folder_name):
+        curr = os.getcwd()
+        curr = os.path.dirname(curr)
+        proj_folder = folder_name
+        stored_file_loc = os.path.join(curr, proj_folder)
+        return stored_file_loc
+
     @classmethod
     def make_file(cls,
                   articles: List[str],
@@ -22,10 +29,7 @@ class FileManager:
                   kind: str,
                   idx: Optional[int] = None) -> None:
 
-        curr = os.getcwd()
-        curr = os.path.dirname(curr)
-        proj_folder = 'files'
-        stored_file_loc = os.path.join(curr, proj_folder)
+        stored_file_loc = FileManager.get_save_path('files')
         delta = return_delta(posting_date)
 
         if idx is not None:

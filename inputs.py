@@ -21,3 +21,9 @@ news = {
         'kotra': 'https://news.kotra.or.kr/user/globalBbs/kotranews/982/globalBbsDataList.do?setIdx=242&pageViewType=&column=&search=&searchCmmdyCateCd=&searchAreaCd=&searchNationCd=&searchTradeCd=&searchStartDate=&searchEndDate=&searchCategoryIdxs=&searchIndustryCateIdx=&row=10&searchItemCode=&searchItemName=&page=2'
     },
 }
+
+tickers = {
+    "group1": ["AMZN", "AAPL"],
+}
+
+time = {"before": 1, "base": "2020-01-01", "after": 1}
