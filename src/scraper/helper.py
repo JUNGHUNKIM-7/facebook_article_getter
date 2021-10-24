@@ -33,31 +33,31 @@ class Container:
     @classmethod
     def run_fb_switch(cls, run: bool = False):
         if run:
-            print('Status : run Facebook')
+            print('Status : Run Facebook')
             Container.RUN_FB = run
             return Container.RUN_FB
         else:
-            print('Status : off Facebook')
+            print('Status : Off Facebook')
             return Container.RUN_FB
 
     @classmethod
-    def set_headless(cls, headless: bool = False):
+    def set_headless(cls, headless):
         if headless:
-            print('Option : headless')
+            print('Option : Headless')
             Container.HEAD_LESS = headless
             return Container.HEAD_LESS
         else:
-            print('Option : set Headless')
+            print('Option : No Headless')
             return Container.HEAD_LESS
 
     @classmethod
-    def kill_browser(cls, kill: bool = False):
+    def kill_browser(cls, kill):
         if kill:
-            print('Option : kill browser')
-            Container.HEAD_LESS = kill
+            print('Option : Kill browser')
+            Container.BROWSER_STATUS = kill
             return Container.BROWSER_STATUS
         else:
-            print('Option : keep running browser')
+            print('Option : No Kill browser')
             return Container.BROWSER_STATUS
 
     @classmethod

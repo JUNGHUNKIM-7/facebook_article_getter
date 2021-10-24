@@ -1,27 +1,28 @@
 import time
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 from datetime import date
 import pandas as pd
 from pandas import DataFrame
 import pandas_datareader as pdr
 
 from file_controller import FileManager
-from src.tickers.timedel import TimeContainer
+from src.tickers.time_container import TimeContainer
 
 
 class TickerContainer:
     PARSE_TICKER = False
 
     @classmethod
-    def parse_ticker_switch(cls, on: Optional[bool] = None):
-        TickerContainer.PARSE_TICKER = on
+    def parse_ticker_switch(cls, run: bool):
+        TickerContainer.PARSE_TICKER = run
+        return TickerContainer.PARSE_TICKER
 
     def __init__(self, source: str, ticker_li: List[str], time: Dict[str, str]):
         self.source = source
         self.__ticker_li = ticker_li
         self.__start = TimeContainer(time).start
         self.__end = TimeContainer(time).end
-        self.__date_string = TimeContainer.date_string
+        self.__date_string = TimeContainer(time).date_string
 
     @property
     def tickers(self) -> List[str]:
@@ -46,4 +47,4 @@ class TickerContainer:
             time.sleep(1)
             df: DataFrame = pd.DataFrame(df)
             df.to_csv(fr'{file_loc}\{ticker}_{str(self.__start)}_{str(self.__end)}')
-            print(f'download {ticker} -{self.__start} | {self.__date_string} | +{self.__end} done')
+            print(f'{ticker} {self.__start} to {self.__end} downloaded')
