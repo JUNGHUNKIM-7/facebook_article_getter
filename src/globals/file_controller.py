@@ -6,7 +6,7 @@ from datetime import date
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 
-from src.scraper.date import return_delta
+from src.scraper.timedelta_helper import return_delta
 
 
 # todo
@@ -14,11 +14,11 @@ from src.scraper.date import return_delta
 
 class FileManager:
     @classmethod
-    def get_save_path(cls, folder_name):
+    def get_save_path(cls, folder_name: str) -> str:
         curr = os.getcwd()
-        curr = os.path.dirname(curr)
+        root = os.path.dirname(curr)
         proj_folder = folder_name
-        stored_file_loc = os.path.join(curr, proj_folder)
+        stored_file_loc = os.path.join(root, proj_folder)
         return stored_file_loc
 
     @classmethod
@@ -29,7 +29,7 @@ class FileManager:
                   kind: str,
                   idx: Optional[int] = None) -> None:
 
-        stored_file_loc = FileManager.get_save_path('files')
+        stored_file_loc = FileManager.get_save_path(r'data_getter\files')
         delta = return_delta(posting_date)
 
         if idx is not None:

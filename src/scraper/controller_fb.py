@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Optional, Union, List, Tuple
+from typing import Optional, Union, List, Tuple, Dict
 
 from dotenv import load_dotenv
 from selenium import webdriver as driver
@@ -11,32 +11,31 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from file_controller import FileManager
-
-
-# todo search_keyword 작동
+from src.globals.file_controller import FileManager
 
 
 class FacebookController(driver.Firefox):
     load_dotenv()
+    OPS = driver.FirefoxOptions()
 
-    HEADLESS = False
-    HEADLESS_ON = driver.FirefoxOptions().headless
-
-    def __init__(self, loc: str, person_name: str, person_info: Optional[str] = None,
+    def __init__(self, loc: str,
+                 person_name: str,
+                 person_info: Optional[str] = None,
                  driver_path: str = r'data_getter\geckodriver.exe',
-                 close: bool = False):
-        os.environ["PATH"] += driver_path
+                 options: Optional[Dict[str, bool]] = None):
 
+        os.environ["PATH"] += driver_path
         self.__id = os.getenv('FB_ID')
         self.__password = os.getenv('FB_PASS')
         self.loc = loc
         self.person_name = person_name
         self.person_info = person_info
-        self.close = close
-        self.__headless = FacebookController.HEADLESS
+        self.__headless = options['headless']
+        self.__browser_status = options['browser_status']
+
         if self.__headless:
-            super(FacebookController, self).__init__(FacebookController.HEADLESS_ON)
+            FacebookController.OPS.headless = self.__headless
+            super(FacebookController, self).__init__(options=FacebookController.OPS)
         else:
             super(FacebookController, self).__init__()
 
@@ -53,11 +52,12 @@ class FacebookController(driver.Firefox):
             for i, wrapper_elem in enumerate(web_elements):
                 yield i, wrapper_elem
 
-    def close_browser(self, close: bool = False) -> None:
-        self.close = close
-        if self.close is True:
+    def close_browser(self) -> None:
+        if self.__browser_status:
             time.sleep(3)
             self.quit()
+        else:
+            print('Running Program Done')
 
     def login(self) -> None:
         self.get(self.loc)

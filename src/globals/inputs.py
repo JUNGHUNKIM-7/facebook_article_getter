@@ -25,11 +25,19 @@ news = {
 tickers = {
     "group1": {
         'source': 'yahoo',
-        'tickers': ["AMZN", "AAPL"]
+        'tickers_group': ["AMZN", "AAPL"]
+    },
+    "group2": {
+        'source': 'yahoo',
+        'tickers_group': ["AMZN", "AAPL"]
     }
 }
 
 time_set = {
-    'set1': {"before": 1, "base": "2020-01-01", "after": 1}
+    'set1': {
+        "before": 1, "base": "2020-01-01", "after": 1
+    },
+    'set2': {
+        "before": 10, "base": "2020-05-05"
+    }
 }
-

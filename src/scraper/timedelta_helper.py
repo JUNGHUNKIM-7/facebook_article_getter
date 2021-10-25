@@ -42,4 +42,3 @@ def return_delta(data: str):
         return relativedelta(months=left, days=right)
     else:
         return timedelta(days=val)
-

@@ -3,9 +3,8 @@ from bs4 import BeautifulSoup
 import requests as r
 
 
-# import markdown as m
-# from prettytable import PrettyTable
-
+# import markdown as mPrettyTable
+# from prettytable import
 
 class DataHandler:
     headers = {
