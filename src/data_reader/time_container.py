@@ -15,10 +15,15 @@ class TimeContainer:
             self.__delta_end = timedelta(days=0)
 
         self.__dateString = time_val.get('base')
+        self.__specific_date = time_val.get('specific')
         self.__today = datetime.now().date()
 
         y, m, d = [int(e) for e in self.__dateString.split("-")]
         self.__base = datetime(y, m, d).date()
+
+        if self.__specific_date is not None:
+            y, m, d = [int(e) for e in self.__specific_date.split("-")]
+            self.__specific = datetime(y, m, d).date()
 
         self.__date = {
             "before_from_base": self.__base - self.__delta_start,
@@ -31,6 +36,10 @@ class TimeContainer:
     @property
     def base(self) -> date:
         return self.__base
+
+    @property
+    def specific(self) -> date:
+        return self.__specific
 
     @property
     def start(self) -> date:

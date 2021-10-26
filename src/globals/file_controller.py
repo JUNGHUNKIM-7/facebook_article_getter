@@ -47,7 +47,7 @@ class FileManager:
                          file_name: str,
                          kind: str):
         try:
-            if web_elems_or_data_list is not List[str]:
+            if type(web_elems_or_data_list) is WebElement:
                 article_list = []
                 divs = web_elems_or_data_list.find_elements(By.CSS_SELECTOR, 'div[style="text-align: start;"]')
                 date_from_web_elem = post_date.get_attribute('innerText').strip()

@@ -1,6 +1,6 @@
 from typing import Optional, Union, Dict
 
-from src.scraper.controller_fb import FacebookController
+from src.scraper.controller_fb_deprecated import FacebookController
 from src.scraper.controller_soup import DataHandler
 
 
@@ -54,9 +54,17 @@ class InstanceController:
 
     # return FacebookController | DataHandler
     @classmethod
-    def make_instance(cls, key: str, news_channel: Optional[str] = None, options: Optional[Dict[str, bool]] = None,
-                      **kwargs) \
-            -> Union[FacebookController, DataHandler]:
+    def make_instance(cls,
+                      key: str,
+                      news_channel: Optional[str] = None,
+                      options: Dict[str, bool] = None,
+                      **kwargs) -> Union[FacebookController, DataHandler]:
+        if options is None:
+            options = {
+                'headless': InstanceController.HEAD_LESS,
+                'browser_status': InstanceController.BROWSER_STATUS
+            }
+
         if key == 'facebook':
             obj = kwargs.get(key)
             key_li = ['url', 'person_name', 'person_info']
@@ -94,7 +102,7 @@ class InstanceController:
                 """)
             instance.login()
             instance.search_person()
-            instance.search_posts(search_keyword=search_keyword)
+            instance.search_posts(year=year, search_keyword=search_keyword)
             instance.bottom_end(drag_count_or_infinite=drag_count_or_infinite)
             instance.saved_file_by_moving(
                 file_name=file_name,
