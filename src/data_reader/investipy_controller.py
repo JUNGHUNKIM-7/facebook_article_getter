@@ -1,11 +1,11 @@
-import investpy
+from typing import Dict, Any, List, Optional
+
 import pandas as pd
 from pandas import DataFrame
+import investpy
 from investpy.utils.search_obj import SearchObj
 
 from src.globals.time_container import TimeContainer
-from typing import Dict, Any, List, Optional
-
 from src.globals.file_controller import FileManager
 
 
@@ -44,6 +44,7 @@ class InvestipyController:
 
         sy, sm, sd = [elem for elem in str(self.__start).split('-')]
         ey, em, ed = [elem for elem in str(self.__end).split('-')]
+
         self.__start = f'{sd}/{sm}/{sy}'
         self.__end = f'{ed}/{em}/{ey}'
 
@@ -64,22 +65,24 @@ class InvestipyController:
                                                     to_date=self.__end)
             print(df)  # todo
 
-    def get_info(self, elem) -> DataFrame:
-        dict: Dict[str, Any] = elem.retrieve_information()  # return dict
+    @staticmethod
+    def get_info(elem: SearchObj) -> DataFrame:
+        info_dict: Dict[str, Any] = elem.retrieve_information()  # return dict
         key_temp = []
         value_temp = []
 
-        for key, value in dict.items():
+        for key, value in info_dict.items():
             key_temp.append(key)
             value_temp.append(value)
         df: DataFrame = pd.DataFrame(data={'indicator': key_temp, 'value': value_temp})
         return df
 
-    def get_technical_info(self, elem, interval: str) -> DataFrame:
+    @staticmethod
+    def get_technical_info(elem: SearchObj, interval: str) -> DataFrame:
         df: DataFrame = elem.retrieve_technical_indicators(interval=interval)  # return dataframes
         return df
 
-    def get_technical_combined_to_csv(self, interval_for_technical_data: str) -> None:
+    def get_technical_indicator_by_csv(self, interval_for_technical_data: str) -> None:
         loc = FileManager.get_save_path(r'data_getter\files')
         for elem in self.container():
             info_df = self.get_info(elem=elem)

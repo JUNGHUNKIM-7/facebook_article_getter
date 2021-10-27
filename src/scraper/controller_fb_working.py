@@ -42,16 +42,6 @@ class FacebookController(driver.Firefox):
         self.implicitly_wait(5)
         # self.maximize_window()
 
-    @classmethod
-    def make_wrapper_generator(cls, web_elements: List[WebElement], dates: Optional[List[WebElement]] = None) \
-            -> Union[Tuple[int, WebElement, WebElement], Tuple[int, WebElement]]:
-        if dates:
-            for (i, wrapper_elem), date in zip(enumerate(web_elements), dates):
-                yield i, wrapper_elem, date
-        else:
-            for i, wrapper_elem in enumerate(web_elements):
-                yield i, wrapper_elem
-
     def close_browser(self) -> None:
         if self.__browser_status:
             time.sleep(3)
@@ -185,6 +175,16 @@ class FacebookController(driver.Firefox):
         scroll_y_by = desired_y - current_y
         self.execute_script("window.scrollBy(0, arguments[0]);", scroll_y_by)
         time.sleep(2)
+
+    @staticmethod
+    def make_wrapper_generator(web_elements: List[WebElement], dates: Optional[List[WebElement]] = None) \
+            -> Union[Tuple[int, WebElement, WebElement], Tuple[int, WebElement]]:
+        if dates:
+            for (i, wrapper_elem), date in zip(enumerate(web_elements), dates):
+                yield i, wrapper_elem, date
+        else:
+            for i, wrapper_elem in enumerate(web_elements):
+                yield i, wrapper_elem
 
     def saved_file_by_moving(self,
                              file_name: str,

@@ -1,11 +1,11 @@
-from src.scraper.instance_controller import InstanceController
+from src.globals.options_controller import OptionsController
 
 # Facebook options
-RUN_FB = InstanceController.set_running_fb(run=False)
-InstanceController.set_headless(headless=False)
-InstanceController.set_kill_browser(kill=True)
+RUN_FB = OptionsController.set_running_fb(run=False)
+OptionsController.set_headless(headless=False)
+OptionsController.set_kill_browser(kill=True)
 
 # Pdr options
-PARSE_TICKER_ONLY = InstanceController.parse_ticker_switch(run=False)
+PARSE_TICKER = OptionsController.parse_ticker_switch(run=True)
 # INVESTIPY
-RUN_INVESTIPY = InstanceController.set_investipy(run=True)
+RUN_INVESTIPY = OptionsController.set_investipy(run=False)

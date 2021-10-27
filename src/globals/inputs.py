@@ -37,7 +37,7 @@ news = {
 tickers = {
     "group1": {
         'source': 'yahoo',
-        'tickers_group': ["AMZN","AAPL"]
+        'tickers_group': ["AMZN", "AAPL"]
     },
     # "group2": {
     #     'source': 'yahoo',

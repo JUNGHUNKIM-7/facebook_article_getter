@@ -1,6 +1,7 @@
 import time
 from typing import List, Dict, Tuple, Any
 from datetime import date
+
 import pandas as pd
 from pandas import DataFrame
 import pandas_datareader as pdr
@@ -44,6 +45,16 @@ class TickerController:
     def time_data(self, other_dict: Dict[str, str]) -> None:
         TimeContainer(other_dict)
 
+    @staticmethod
+    def handle_csv(df, new_cols, file_loc, ticker, start, end):
+        column_set = zip(df.columns, new_cols)
+        [df.rename(columns={old: new}, inplace=True) for old, new in column_set]
+        df = df.round(decimals=3)
+
+        df.set_index('일자', inplace=True)
+        df.to_csv(fr'{file_loc}\{ticker}_{str(start)}_{str(end)}.csv')
+        print(f'{ticker} {start} to {end} downloaded')
+
     def save_to_csv(self) -> None:
         file_loc = FileManager.get_save_path('data_getter\\files')
         for ticker in self.__ticker_li:
@@ -58,13 +69,7 @@ class TickerController:
                     {'Close': 'Close Diff', 'Adj Close': 'Adj Close Diff'}, axis=1)], axis=1)
                 new_cols = ['일자', '일별최고가', '일별최저가', '시작가', '종가', '거래량', '조정종가', '전일대비종가(%)', '전일대비조정종가(%)']
 
-                column_set = zip(df.columns, new_cols)
-                [df.rename(columns={old: new}, inplace=True) for old, new in column_set]
-                df = df.round(decimals=3)
-
-                df.set_index('일자', inplace=True)
-                df.to_csv(fr'{file_loc}\{ticker}_{str(self.__start)}_{str(self.__end)}.csv')
-                print(f'{ticker} {self.__start} to {self.__end} downloaded')
+                TickerController.handle_csv(df, new_cols, file_loc, ticker, self.__start, self.__end)
 
             if self.__source == 'naver':
                 df = pdr.DataReader(ticker, self.__source, self.__start, self.__end)
@@ -82,10 +87,4 @@ class TickerController:
                 df.drop(columns='shifted', inplace=True)
                 new_cols = ['일자', '시작가', '일별최고가', '일별최저가', '종가', '거래량']
 
-                column_set = zip(df.columns, new_cols)
-                [df.rename(columns={old: new}, inplace=True) for old, new in column_set]
-                df = df.round(decimals=3)
-
-                df.set_index('일자', inplace=True)
-                df.to_csv(fr'{file_loc}\{ticker}_{str(self.__start)}_{str(self.__end)}.csv')
-                print(f'{ticker} {self.__start} to {self.__end} downloaded')
+                TickerController.handle_csv(df, new_cols, file_loc, ticker, self.__start, self.__end)

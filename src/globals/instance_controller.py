@@ -1,69 +1,12 @@
 from typing import Optional, Union, Dict
 
+from src.globals.options_controller import OptionsController
 from src.data_reader.ticker_manager import TickerManager
 from src.scraper.controller_fb_working import FacebookController
 from src.scraper.controller_soup import SoupController
 
 
 class InstanceController:
-    # tickers
-    PARSE_TICKER = True
-
-    # FB
-    RUN_FB = True
-    HEAD_LESS = True
-    BROWSER_STATUS = True
-
-    # Investipy
-    RUN_INVESTIPY = True
-
-    # Options
-    @classmethod
-    def parse_ticker_switch(cls, run: bool = PARSE_TICKER) -> bool:
-        if run is False:
-            InstanceController.PARSE_TICKER = run
-            return InstanceController.PARSE_TICKER
-        else:
-            return InstanceController.PARSE_TICKER
-
-    @classmethod
-    def set_running_fb(cls, run: bool = RUN_FB):
-        if run is False:
-            InstanceController.RUN_FB = run
-            print('Status : Not Facebook')
-            return InstanceController.RUN_FB
-        else:
-            print('Status : Running Facebook')
-            return InstanceController.RUN_FB
-
-    @classmethod
-    def set_headless(cls, headless: bool = HEAD_LESS):
-        if headless is False:
-            print('Option : Not Headless')
-            InstanceController.HEAD_LESS = headless
-            return InstanceController.HEAD_LESS
-        else:
-            print('Option : On Headless')
-            return InstanceController.HEAD_LESS
-
-    @classmethod
-    def set_kill_browser(cls, kill: bool = BROWSER_STATUS):
-        if kill is False:
-            print('Option : Not Kill browser')
-            InstanceController.BROWSER_STATUS = kill
-            return InstanceController.BROWSER_STATUS
-        else:
-            print('Option : Kill browser')
-            return InstanceController.BROWSER_STATUS
-
-    @classmethod
-    def set_investipy(cls, run: bool = PARSE_TICKER) -> bool:
-        if run is False:
-            InstanceController.PARSE_TICKER = run
-            return InstanceController.RUN_INVESTIPY
-        else:
-            return InstanceController.RUN_INVESTIPY
-
     # return instance for running
     @classmethod
     def make_instance(cls,
@@ -73,8 +16,8 @@ class InstanceController:
                       **kwargs) -> Union[FacebookController, SoupController]:
         if options is None:
             options = {
-                'headless': InstanceController.HEAD_LESS,
-                'browser_status': InstanceController.BROWSER_STATUS
+                'headless': OptionsController.HEAD_LESS,
+                'browser_status': OptionsController.BROWSER_STATUS
             }
 
         if key == 'facebook':
@@ -125,7 +68,7 @@ class InstanceController:
         except Exception as e:
             raise e
         finally:
-            if InstanceController.BROWSER_STATUS:
+            if OptionsController.BROWSER_STATUS:
                 instance.delete_all_cookies()
                 instance.close_browser()
             else:
@@ -146,4 +89,4 @@ class InstanceController:
     @classmethod
     def run_investipy(cls):
         for ticker_py_ins in TickerManager.return_ticker_ins_li(source='investipy'):  # return, each instance
-            ticker_py_ins.get_technical_combined_to_csv(interval_for_technical_data='monthly')
+            ticker_py_ins.get_technical_indicator_by_csv(interval_for_technical_data='monthly')
