@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, date
-from typing import Dict
+from typing import Dict, Any
 
 
 class TimeContainer:
-    def __init__(self, time_val: Dict[str, str]) -> None:
+    def __init__(self, time_val: Dict[str, Any]) -> None:
         if time_val.get('before') is not None:
             self.__delta_start = timedelta(days=float(time_val.get('before')))
         else:

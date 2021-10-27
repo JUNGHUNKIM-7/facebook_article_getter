@@ -6,4 +6,6 @@ InstanceController.set_headless(headless=False)
 InstanceController.set_kill_browser(kill=True)
 
 # Pdr options
-PARSE_TICKER_ONLY = InstanceController.parse_ticker_switch(run=True)
+PARSE_TICKER_ONLY = InstanceController.parse_ticker_switch(run=False)
+# INVESTIPY
+RUN_INVESTIPY = InstanceController.set_investipy(run=True)

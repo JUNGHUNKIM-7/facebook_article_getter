@@ -6,7 +6,7 @@ from datetime import date
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 
-from src.scraper.timedelta_helper import return_delta
+from src.scraper.facebook_post_date_converter import return_delta
 
 
 # todo

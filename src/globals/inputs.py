@@ -7,6 +7,9 @@ fb = {
 }
 
 news = {
+    'investing': {
+        'market': 'https://kr.investing.com/'
+    },
     'cnbc': {
         'market': 'https://www.cnbc.com/markets/'
     },
@@ -22,37 +25,37 @@ news = {
     },
 }
 
+# "group1": {
+#     'source': 'naver',
+#     'tickers_group': ["005930", "035720"]
+# },
+# "group2": {
+#     'source': 'naver',
+#     'tickers_group': ["000660", "066570"]
+# },
 # Test Done
 tickers = {
     "group1": {
-        'source': 'naver',
-        'tickers_group': ["005930", "035720"]
-    },
-    "group2": {
-        'source': 'naver',
-        'tickers_group': ["000660", "066570"]
-    },
-    "group3": {
         'source': 'yahoo',
-        'tickers_group': ["AMZN", "AAPL"]
+        'tickers_group': ["AMZN","AAPL"]
     },
-    "group4": {
-        'source': 'yahoo',
-        'tickers_group': ["AMZN", "AAPL"]
-    }
+    # "group2": {
+    #     'source': 'yahoo',
+    #     'tickers_group': ["AMZN", "AAPL"]
+    # }
 }
 
 time_set = {
     'set1': {
         "before": 1, "base": "2020-01-01", "after": 1
     },
-    'set2': {
-        "before": 10, "base": "2020-05-05"
-    },
-    'set3': {
-        "base": "2020-05-05", "after": 3
-    },
-    'set4': {
-        "base": "2020-05-05", "specific": "2020-07-07"
-    }
+    # 'set2': {
+    #     "before": 10, "base": "2020-05-05"
+    # },
+    # 'set3': {
+    #     "base": "2020-05-05", "after": 3
+    # },
+    # 'set4': {
+    #     "base": "2020-05-05", "specific": "2020-07-07"
+    # }
 }

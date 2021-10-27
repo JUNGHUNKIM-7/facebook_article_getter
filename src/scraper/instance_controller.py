@@ -1,7 +1,8 @@
 from typing import Optional, Union, Dict
 
-from src.scraper.controller_fb_deprecated import FacebookController
-from src.scraper.controller_soup import DataHandler
+from src.data_reader.ticker_manager import TickerManager
+from src.scraper.controller_fb_working import FacebookController
+from src.scraper.controller_soup import SoupController
 
 
 class InstanceController:
@@ -13,6 +14,10 @@ class InstanceController:
     HEAD_LESS = True
     BROWSER_STATUS = True
 
+    # Investipy
+    RUN_INVESTIPY = True
+
+    # Options
     @classmethod
     def parse_ticker_switch(cls, run: bool = PARSE_TICKER) -> bool:
         if run is False:
@@ -21,7 +26,6 @@ class InstanceController:
         else:
             return InstanceController.PARSE_TICKER
 
-    # make for instance options
     @classmethod
     def set_running_fb(cls, run: bool = RUN_FB):
         if run is False:
@@ -52,13 +56,21 @@ class InstanceController:
             print('Option : Kill browser')
             return InstanceController.BROWSER_STATUS
 
-    # return FacebookController | DataHandler
+    @classmethod
+    def set_investipy(cls, run: bool = PARSE_TICKER) -> bool:
+        if run is False:
+            InstanceController.PARSE_TICKER = run
+            return InstanceController.RUN_INVESTIPY
+        else:
+            return InstanceController.RUN_INVESTIPY
+
+    # return instance for running
     @classmethod
     def make_instance(cls,
                       key: str,
                       news_channel: Optional[str] = None,
                       options: Dict[str, bool] = None,
-                      **kwargs) -> Union[FacebookController, DataHandler]:
+                      **kwargs) -> Union[FacebookController, SoupController]:
         if options is None:
             options = {
                 'headless': InstanceController.HEAD_LESS,
@@ -71,11 +83,11 @@ class InstanceController:
             url, person_name, person_info = [obj.get(key) for key in key_li]
             return FacebookController(loc=url, person_name=person_name, person_info=person_info, options=options)
 
-        elif key == 'cnbc' or key == 'yh' or key == 'trade':
+        elif key == 'cnbc' or key == 'yh' or key == 'trade' or key == 'investing':
             obj = kwargs.get(key)
             if news_channel:
                 url = obj.get(news_channel)
-                return DataHandler(url=url)
+                return SoupController(url=url)
         else:
             raise Exception('No Data Found')
 
@@ -120,5 +132,18 @@ class InstanceController:
                 print('Running Finished')
 
     @classmethod
-    def run_news(cls):
-        pass
+    def run_news(cls, instance: SoupController):
+        try:
+            instance.get_html()
+        except Exception as e:
+            print(e)
+
+    @classmethod
+    def run_data_reader(cls):
+        for ticker_ins in TickerManager.return_ticker_ins_li(source='pds'):
+            ticker_ins.save_to_csv()
+
+    @classmethod
+    def run_investipy(cls):
+        for ticker_py_ins in TickerManager.return_ticker_ins_li(source='investipy'):  # return, each instance
+            ticker_py_ins.get_technical_combined_to_csv(interval_for_technical_data='monthly')

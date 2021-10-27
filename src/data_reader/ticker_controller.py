@@ -6,7 +6,7 @@ from pandas import DataFrame
 import pandas_datareader as pdr
 
 from src.globals.file_controller import FileManager
-from src.data_reader.time_container import TimeContainer
+from src.globals.time_container import TimeContainer
 
 
 class TickerController:
