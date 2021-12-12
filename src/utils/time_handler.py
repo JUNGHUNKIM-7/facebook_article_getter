@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, Any
 
 
-class TimeContainer:
+class TimeHandler:
     def __init__(self, time_val: Dict[str, Any]) -> None:
         self.__starting = time_val.get("before")
         self.__ending = time_val.get("after")

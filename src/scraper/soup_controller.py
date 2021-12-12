@@ -1,7 +1,8 @@
 from typing import Dict, List, Union, Any
 from bs4 import BeautifulSoup
-from src.globals.file_controller import FileManager
 import requests as r
+
+from src.utils.file_handler import FileHandler
 
 
 class SoupController:
@@ -18,7 +19,7 @@ class SoupController:
             print(e)
 
     def get_html(self):
-        stored_loc = FileManager.get_save_path(r'data_getter\files')
+        stored_loc = FileHandler.get_save_path(r'data_getter\files')
         with open(fr'{stored_loc}\page.html', 'w', encoding='utf-8') as f:
             f.write(self.soup.prettify())
 

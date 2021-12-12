@@ -6,13 +6,13 @@ from datetime import date
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 
-from src.scraper.facebook_post_date_converter import return_delta
+from scraper.fb_posting_date_helper import return_delta
 
 
 SAVE_DIR = r"finance_data_getter\files"
 
 
-class FileManager:
+class FileHandler:
     @classmethod
     def get_save_path(cls, folder_name: str = SAVE_DIR) -> str:
         curr = os.getcwd()
@@ -30,7 +30,7 @@ class FileManager:
         idx: Optional[int] = None,
     ) -> None:
 
-        stored_file_loc = FileManager.get_save_path(file_name)
+        stored_file_loc = FileHandler.get_save_path(file_name)
         delta = return_delta(posting_date)
 
         if idx is not None and delta is not None:
@@ -70,7 +70,7 @@ class FileManager:
                         time.sleep(0.5)
                         article_list.append(div.get_attribute("innerHTML").strip())
 
-                FileManager.make_file(
+                FileHandler.make_file(
                     articles=article_list,
                     posting_date=date_data or "",
                     file_name=file_name,
@@ -80,7 +80,7 @@ class FileManager:
 
             else:
                 if type(web_elems_or_data_list) is List[str] and type(post_date) is str:
-                    FileManager.make_file(
+                    FileHandler.make_file(
                         articles=web_elems_or_data_list,
                         posting_date=post_date,
                         file_name=file_name,

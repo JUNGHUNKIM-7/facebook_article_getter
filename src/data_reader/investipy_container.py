@@ -5,11 +5,11 @@ from pandas import DataFrame
 import investpy
 from investpy.utils.search_obj import SearchObj
 
-from src.globals.time_container import TimeContainer
-from src.globals.file_controller import FileManager
+from src.utils.time_handler import TimeHandler
+from src.utils.file_handler import FileHandler
 
 
-class InvestipyController:
+class InvestipyContainer:
     def __init__(
         self,
         ticker_li: List[str],
@@ -30,23 +30,23 @@ class InvestipyController:
             self.n_result = 1
 
         if time_data.get("before") is not None:
-            self.__start = TimeContainer(time_data).start
+            self.__start = TimeHandler(time_data).start
         else:
-            self.__start = TimeContainer(time_data).base
+            self.__start = TimeHandler(time_data).base
 
         if time_data.get("after") is not None and time_data.get("specific") is None:
-            self.__end = TimeContainer(time_data).end
+            self.__end = TimeHandler(time_data).end
         elif time_data.get("after") is None and time_data.get("specific") is not None:
-            self.__end = TimeContainer(time_data).specific
+            self.__end = TimeHandler(time_data).specific
         elif (
             time_data.get("before")
             and time_data.get("base")
             and not time_data.get("after")
             and not time_data.get("specific")
         ):
-            self.__end = TimeContainer(time_data).base
+            self.__end = TimeHandler(time_data).base
         else:
-            self.__end = TimeContainer(time_data).today
+            self.__end = TimeHandler(time_data).today
 
         sy, sm, sd = [elem for elem in str(self.__start).split("-")]
         ey, em, ed = [elem for elem in str(self.__end).split("-")]
@@ -98,7 +98,7 @@ class InvestipyController:
         return df
 
     def get_technical_indicator_by_csv(self, interval_for_technical_data: str) -> None:
-        loc = FileManager.get_save_path()
+        loc = FileHandler.get_save_path()
         for elem in self.container():
             info_df = self.get_info(elem=elem)
             technical_df = self.get_technical_info(

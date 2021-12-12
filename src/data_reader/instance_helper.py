@@ -1,21 +1,21 @@
 from typing import List, Union
-from src.globals.inputs import *
-from src.data_reader.ticker_controller import TickerController
-from src.data_reader.investipy_controller import InvestipyController
+from inputs import *
+from src.data_reader.data_reader_container import DataReaderContainer
+from src.data_reader.investipy_container import InvestipyContainer
 
 
-class TickerManager:
+class TickerInstanceHelper:
     @classmethod
     def return_ticker_ins_li(
         cls, source: str
-    ) -> Union[List[TickerController], List[InvestipyController], None]:
+    ) -> Union[List[DataReaderContainer], List[InvestipyContainer], None]:
         instance_li = []
 
         if source != "pds" and source != "investipy" and not source:
             raise Exception("Any Source Found to Search tickers")
         elif source == "pds":
             for i in range(len(tickers.keys())):
-                ticker_instance = TickerController(
+                ticker_instance = DataReaderContainer(
                     source=tickers[f"group{i + 1}"]["source"],
                     ticker_li=tickers[f"group{i + 1}"]["tickers_group"],
                     time_data=time_set[f"set{i + 1}"],
@@ -24,7 +24,7 @@ class TickerManager:
             return instance_li
         elif source == "investipy":
             for i in range(len(tickers.keys())):
-                ticker_instance = InvestipyController(
+                ticker_instance = InvestipyContainer(
                     ticker_li=tickers[f"group{i + 1}"]["tickers_group"],
                     time_data=time_set[f"set{i + 1}"],
                 )

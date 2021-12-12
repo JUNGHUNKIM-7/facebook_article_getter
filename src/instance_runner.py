@@ -1,14 +1,14 @@
 from typing import Optional, Union, Dict
-from src.data_reader.investipy_controller import InvestipyController
-from src.data_reader.ticker_controller import TickerController
+from data_reader.investipy_container import InvestipyContainer
+from data_reader.data_reader_container import DataReaderContainer
 
-from src.globals.options_controller import OptionsController
-from src.data_reader.ticker_manager import TickerManager
-from src.scraper.controller_fb_working import FacebookController
-from src.scraper.controller_soup import SoupController
+from src.utils.option_container import OptionContainer
+from src.data_reader.instance_helper import TickerInstanceHelper
+from scraper.fb_controller import FacebookController
+from scraper.soup_controller import SoupController
 
 
-class Runner:
+class InstanceRunner:
     @classmethod
     def make_instance(
         cls,
@@ -20,8 +20,8 @@ class Runner:
         obj = kwargs.get(key)
         if options is None:
             options = {
-                "headless": OptionsController.HEAD_LESS,
-                "browser_status": OptionsController.BROWSER_STATUS,
+                "headless": OptionContainer.HEAD_LESS,
+                "browser_status": OptionContainer.BROWSER_STATUS,
             }
 
         if obj != None:
@@ -78,7 +78,7 @@ class Runner:
         except Exception as e:
             raise e
         finally:
-            if OptionsController.BROWSER_STATUS:
+            if OptionContainer.BROWSER_STATUS:
                 instance.delete_all_cookies()
                 instance.close_browser()
             else:
@@ -93,18 +93,18 @@ class Runner:
 
     @classmethod
     def run_data_reader(cls, src="pds") -> None:
-        tickers = TickerManager.return_ticker_ins_li(source=src)
+        tickers = TickerInstanceHelper.return_ticker_ins_li(source=src)
         if tickers != None:
             for ticker_ins in tickers:
-                if type(ticker_ins) is TickerController:
+                if type(ticker_ins) is DataReaderContainer:
                     ticker_ins.save_to_csv()
 
     @classmethod
     def run_investipy(cls, src="investipy") -> None:
-        tickers = TickerManager.return_ticker_ins_li(source=src)
+        tickers = TickerInstanceHelper.return_ticker_ins_li(source=src)
         if tickers != None:
             for ticker_py_ins in tickers:  # return, each instance
-                if type(ticker_py_ins) is InvestipyController:
+                if type(ticker_py_ins) is InvestipyContainer:
                     ticker_py_ins.get_technical_indicator_by_csv(
                         interval_for_technical_data="monthly"
                     )

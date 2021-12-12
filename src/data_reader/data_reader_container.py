@@ -6,32 +6,32 @@ import pandas as pd
 from pandas import DataFrame
 import pandas_datareader as pdr
 
-from src.globals.file_controller import FileManager
-from src.globals.time_container import TimeContainer
+from src.utils.time_handler import TimeHandler
+from src.utils.file_handler import FileHandler
 
 
-class TickerController:
+class DataReaderContainer:
     def __init__(self, source: str, ticker_li: List[str], time_data: Dict[str, Any]):
         self.__source = source
         self.__ticker_li = ticker_li
         if time_data.get("before") is not None:
-            self.__start = TimeContainer(time_data).start
+            self.__start = TimeHandler(time_data).start
         else:
-            self.__start = TimeContainer(time_data).base
+            self.__start = TimeHandler(time_data).base
 
         if time_data.get("after") is not None and time_data.get("specific") is None:
-            self.__end = TimeContainer(time_data).end
+            self.__end = TimeHandler(time_data).end
         elif time_data.get("after") is None and time_data.get("specific") is not None:
-            self.__end = TimeContainer(time_data).specific
+            self.__end = TimeHandler(time_data).specific
         elif (
             time_data.get("before")
             and time_data.get("base")
             and not time_data.get("after")
             and not time_data.get("specific")
         ):
-            self.__end = TimeContainer(time_data).base
+            self.__end = TimeHandler(time_data).base
         else:
-            self.__end = TimeContainer(time_data).today
+            self.__end = TimeHandler(time_data).today
 
     @property
     def tickers(self) -> List[str]:
@@ -47,7 +47,7 @@ class TickerController:
 
     @time_data.setter
     def time_data(self, other_dict: Dict[str, str]) -> None:
-        TimeContainer(other_dict)
+        TimeHandler(other_dict)
 
     @staticmethod
     def handle_csv(df, new_cols, file_loc, ticker, start, end):
@@ -60,7 +60,7 @@ class TickerController:
         print(f"{ticker} {start} to {end} downloaded")
 
     def save_to_csv(self) -> None:
-        file_loc = FileManager.get_save_path()
+        file_loc = FileHandler.get_save_path()
         for ticker in self.__ticker_li:
             if self.__source == "yahoo":
                 df = pdr.DataReader(ticker, self.__source, self.__start, self.__end)
@@ -95,7 +95,7 @@ class TickerController:
                     "전일대비조정종가(%)",
                 ]
 
-                TickerController.handle_csv(
+                DataReaderContainer.handle_csv(
                     df, new_cols, file_loc, ticker, self.__start, self.__end
                 )
 
@@ -116,6 +116,6 @@ class TickerController:
                 df.drop(columns="shifted", inplace=True)
                 new_cols = ["일자", "시작가", "일별최고가", "일별최저가", "종가", "거래량"]
 
-                TickerController.handle_csv(
+                DataReaderContainer.handle_csv(
                     df, new_cols, file_loc, ticker, self.__start, self.__end
                 )

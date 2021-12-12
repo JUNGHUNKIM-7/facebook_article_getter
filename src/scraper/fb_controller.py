@@ -11,7 +11,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from src.globals.file_controller import FileManager
+from src.utils.file_handler import FileHandler
 
 
 class FacebookController(driver.Firefox):
@@ -254,7 +254,7 @@ class FacebookController(driver.Firefox):
                                 time.sleep(1.5)
 
                             print(f"Start Scraping {i + 1}")
-                            FileManager.get_data_as_file(
+                            FileHandler.get_data_as_file(
                                 i=i,
                                 web_elems_or_data_list=wrapper,
                                 post_date=post_date,
@@ -341,7 +341,7 @@ class FacebookController(driver.Firefox):
 
                             # parsing and save files
                             print(f"Start Scraping {i + 1}")
-                            FileManager.get_data_as_file(
+                            FileHandler.get_data_as_file(
                                 i=i,
                                 web_elems_or_data_list=data,
                                 post_date=date,
