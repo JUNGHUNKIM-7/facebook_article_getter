@@ -17,10 +17,10 @@ if __name__ == "__main__":
         if PARSE_TICKER and not RUN_INVESTIPY:
             InstanceRunner.run_data_reader()
         elif not PARSE_TICKER and RUN_INVESTIPY:
-            InstanceRunner.run_investipy()
+            InstanceRunner.run_investipy(kind='stock')
         elif PARSE_TICKER and RUN_INVESTIPY:
             InstanceRunner.run_data_reader()
-            InstanceRunner.run_investipy()
+            InstanceRunner.run_investipy(kind='stock')
         elif RUN_FB:
             fb_ins = InstanceRunner.make_instance(key="facebook", kwargs=fb)
             if fb_ins is not None and type(fb_ins) is FacebookController:

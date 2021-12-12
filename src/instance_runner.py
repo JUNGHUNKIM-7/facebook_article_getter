@@ -100,11 +100,28 @@ class InstanceRunner:
                     ticker_ins.save_to_csv()
 
     @classmethod
-    def run_investipy(cls, src="investipy") -> None:
+    def run_investipy(cls, kind: str, src="investipy") -> None:
         tickers = TickerInstanceHelper.return_ticker_ins_li(source=src)
         if tickers != None:
             for ticker_py_ins in tickers:  # return, each instance
                 if type(ticker_py_ins) is InvestipyContainer:
-                    ticker_py_ins.get_technical_indicator_by_csv(
-                        interval_for_technical_data="monthly"
-                    )
+
+                    if kind == "stock":
+                        ticker_py_ins.get_technical_indicator_to_scv(interval="monthly")
+
+                    elif kind == "technical":
+                        ticker_py_ins.get_technical_to_csv()
+
+                    elif kind == "crypto":
+                        ticker_py_ins.get_crypto_to_csv()
+
+                    elif kind == "efts":
+                        ticker_py_ins.get_etfs_to_csv()
+
+                    elif kind == "commodities":
+                        ticker_py_ins.get_comm_to_csv()
+
+                    else:
+                        raise Exception("Invalid Kind")
+        else:
+            raise Exception("Ticker is None")

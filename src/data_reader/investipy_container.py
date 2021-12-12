@@ -1,4 +1,5 @@
-from typing import Dict, Any, List, Optional
+from datetime import date
+from typing import Dict, Any, List, Optional, Union
 
 import pandas as pd
 from pandas import DataFrame
@@ -54,6 +55,14 @@ class InvestipyContainer:
         self.__start = f"{sd}/{sm}/{sy}"
         self.__end = f"{ed}/{em}/{ey}"
 
+    @property
+    def starting_date(self) -> Union[date, str]:
+        return self.__start
+
+    @property
+    def ending_date(self) -> Union[date, str]:
+        return self.__end
+
     def container(self) -> List[Any]:
         quotes: List[Any] = []
         for ticker in self.ticker_li:
@@ -97,15 +106,25 @@ class InvestipyContainer:
         )  # return dataframes
         return df
 
-    def get_technical_indicator_by_csv(self, interval_for_technical_data: str) -> None:
+    def get_technical_indicator_to_scv(self, interval: str) -> None:
         loc = FileHandler.get_save_path()
         for elem in self.container():
             info_df = self.get_info(elem=elem)
-            technical_df = self.get_technical_info(
-                elem=elem, interval=interval_for_technical_data
-            )
+            technical_df = self.get_technical_info(elem=elem, interval=interval)
             combined_df: DataFrame = pd.concat(
                 [info_df, technical_df], ignore_index=True
             )
             combined_df.to_csv(f"{loc}\\{elem.name}'s_info_with_Technical_info.csv")
             print(f"Technical_info: {elem.name} downloaded")
+
+    def get_technical_to_csv(self):
+        pass
+
+    def get_crypto_to_csv(self):
+        pass
+
+    def get_etfs_to_csv(self):
+        pass
+
+    def get_comm_to_csv(self):
+        pass
