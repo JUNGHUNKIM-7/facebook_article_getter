@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from typing import Union, Tuple
 
 
-def make_month_date(time: str) -> Union[int, Tuple[int, int]]:
+def make_month_date(time: str) -> Union[int, Tuple[int, int],None]:
     parse_time = time.split(' ')
     if len(parse_time) == 1:
         extract_from_li = parse_time[0]
@@ -37,8 +37,10 @@ def make_month_date(time: str) -> Union[int, Tuple[int, int]]:
 
 
 def return_delta(data: str):
-    if type(val := make_month_date(data)) is tuple:
+    val = make_month_date(data)
+    if type(val) is tuple:
         left, right = val[0], val[1]
         return relativedelta(months=left, days=right)
     else:
-        return timedelta(days=val)
+        if type(val) is int:
+            return timedelta(days=val)

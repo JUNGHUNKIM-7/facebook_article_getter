@@ -4,22 +4,26 @@ from typing import Dict, Any
 
 class TimeContainer:
     def __init__(self, time_val: Dict[str, Any]) -> None:
-        if time_val.get('before') is not None:
-            self.__delta_start = timedelta(days=float(time_val.get('before')))
+        self.__starting = time_val.get("before")
+        self.__ending = time_val.get("after")
+
+        if time_val.get("before") is not None and self.__starting:
+            self.__delta_start = timedelta(days=float(self.__starting))
         else:
             self.__delta_start = timedelta(days=0)
 
-        if time_val.get('after') is not None:
-            self.__delta_end = timedelta(days=float(time_val.get('after')))
+        if time_val.get("after") is not None and self.__ending:
+            self.__delta_end = timedelta(days=float(self.__ending))
         else:
             self.__delta_end = timedelta(days=0)
 
-        self.__dateString = time_val.get('base')
-        self.__specific_date = time_val.get('specific')
+        self.__dateString = time_val.get("base")
+        self.__specific_date = time_val.get("specific")
         self.__today = datetime.now().date()
 
-        y, m, d = [int(e) for e in self.__dateString.split("-")]
-        self.__base = datetime(y, m, d).date()
+        if self.__dateString is not None:
+            y, m, d = [int(e) for e in self.__dateString.split("-")]
+            self.__base = datetime(y, m, d).date()
 
         if self.__specific_date is not None:
             y, m, d = [int(e) for e in self.__specific_date.split("-")]
@@ -27,11 +31,11 @@ class TimeContainer:
 
         self.__date = {
             "before_from_base": self.__base - self.__delta_start,
-            "after_from_base": self.__base + self.__delta_end
+            "after_from_base": self.__base + self.__delta_end,
         }
 
-        self.__starting_date = self.__date['before_from_base']
-        self.__ending_date = self.__date['after_from_base']
+        self.__starting_date = self.__date["before_from_base"]
+        self.__ending_date = self.__date["after_from_base"]
 
     @property
     def base(self) -> date:
