@@ -8,6 +8,7 @@ import pandas_datareader as pdr
 
 from src.utils.time_handler import TimeHandler
 from src.utils.file_handler import FileHandler
+from src.utils.option_container import OptionContainer
 
 
 class DataReaderContainer:
@@ -33,24 +34,18 @@ class DataReaderContainer:
         else:
             self.__end = TimeHandler(time_data).today
 
-    @property
-    def tickers(self) -> List[str]:
-        return self.__ticker_li
-
-    @tickers.setter
-    def tickers(self, other_li: List[str]) -> None:
-        self.__ticker_li = other_li
-
-    @property
-    def time_data(self) -> Tuple[date, date]:
-        return self.__start, self.__end
-
-    @time_data.setter
-    def time_data(self, other_dict: Dict[str, str]) -> None:
-        TimeHandler(other_dict)
+    def __str__(self):
+        return f"{self.__ticker_li}\n{self.__start}\n{self.__end}"
 
     @staticmethod
-    def handle_csv(df, new_cols, file_loc, ticker, start, end):
+    def handle_csv(
+        df: DataFrame,
+        new_cols: List[str],
+        file_loc: str,
+        ticker: str,
+        start: date,
+        end: date,
+    ):
         column_set = zip(df.columns, new_cols)
         [df.rename(columns={old: new}, inplace=True) for old, new in column_set]
         df = df.round(decimals=3)
@@ -60,7 +55,7 @@ class DataReaderContainer:
         print(f"{ticker} {start} to {end} downloaded")
 
     def save_to_csv(self) -> None:
-        file_loc = FileHandler.get_save_path()
+        file_loc = OptionContainer.save_path()
         for ticker in self.__ticker_li:
             if self.__source == "yahoo":
                 df = pdr.DataReader(ticker, self.__source, self.__start, self.__end)
@@ -78,7 +73,7 @@ class DataReaderContainer:
                             columns={
                                 "Close": "Close Diff",
                                 "Adj Close": "Adj Close Diff",
-                            },
+                            }
                         ),
                     ],
                     axis=1,

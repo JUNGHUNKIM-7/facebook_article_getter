@@ -1,3 +1,5 @@
+import os
+
 class OptionContainer:
     # tickers
     PARSE_TICKER = True
@@ -10,9 +12,18 @@ class OptionContainer:
     # Investipy
     RUN_INVESTIPY = True
 
+    SAVE_DIR = r"finance_data_getter\files"
+
     # Options
     @classmethod
-    def parse_ticker_switch(cls, run: bool = PARSE_TICKER) -> bool:
+    def save_path(cls, folder_name: str = SAVE_DIR) -> str:
+        curr = os.getcwd()
+        root = os.path.dirname(curr)
+        stored_file_loc = os.path.join(root, folder_name)
+        return stored_file_loc
+
+    @classmethod
+    def set_data_reader(cls, run: bool = PARSE_TICKER) -> bool:
         if run is False:
             OptionContainer.PARSE_TICKER = run
             return OptionContainer.PARSE_TICKER
@@ -23,7 +34,7 @@ class OptionContainer:
     def set_running_fb(cls, run: bool = RUN_FB):
         if run is False:
             OptionContainer.RUN_FB = run
-            print("Status : Not Facebook")
+            print("Status : Not implemented")
             return OptionContainer.RUN_FB
         else:
             print("Status : Running Facebook")
@@ -32,21 +43,21 @@ class OptionContainer:
     @classmethod
     def set_headless(cls, headless: bool = HEAD_LESS):
         if headless is False:
-            print("Option : Not Headless")
+            print("Headless : No")
             OptionContainer.HEAD_LESS = headless
             return OptionContainer.HEAD_LESS
         else:
-            print("Option : On Headless")
+            print("Headless : Yes")
             return OptionContainer.HEAD_LESS
 
     @classmethod
     def set_kill_browser(cls, kill: bool = BROWSER_STATUS):
         if kill is False:
-            print("Option : Not Kill browser")
+            print("KillBrower : No")
             OptionContainer.BROWSER_STATUS = kill
             return OptionContainer.BROWSER_STATUS
         else:
-            print("Option : Kill browser")
+            print("KillBrower : Yes")
             return OptionContainer.BROWSER_STATUS
 
     @classmethod

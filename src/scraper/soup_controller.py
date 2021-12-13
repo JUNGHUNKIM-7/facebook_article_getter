@@ -2,7 +2,7 @@ from typing import Dict, List, Union, Any
 from bs4 import BeautifulSoup
 import requests as r
 
-from src.utils.file_handler import FileHandler
+from src.utils.option_container import OptionContainer
 
 
 class SoupController:
@@ -19,7 +19,7 @@ class SoupController:
             print(e)
 
     def get_html(self):
-        stored_loc = FileHandler.get_save_path(r'data_getter\files')
+        stored_loc = OptionContainer.save_path()
         with open(fr'{stored_loc}\page.html', 'w', encoding='utf-8') as f:
             f.write(self.soup.prettify())
 

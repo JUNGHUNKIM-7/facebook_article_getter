@@ -1,12 +1,11 @@
 from typing import Optional, Union, Dict
-from data_reader.investipy_container import InvestipyContainer
-from data_reader.data_reader_container import DataReaderContainer
+from src.data_reader.investipy_container import InvestipyContainer
+from src.data_reader.data_reader_container import DataReaderContainer
 
 from src.utils.option_container import OptionContainer
 from src.data_reader.instance_helper import TickerInstanceHelper
-from scraper.fb_controller import FacebookController
-from scraper.soup_controller import SoupController
-
+from src.scraper.fb_controller import FacebookController
+from src.scraper.soup_controller import SoupController
 
 class InstanceRunner:
     @classmethod
@@ -100,28 +99,26 @@ class InstanceRunner:
                     ticker_ins.save_to_csv()
 
     @classmethod
-    def run_investipy(cls, kind: str, src="investipy") -> None:
-        tickers = TickerInstanceHelper.return_ticker_ins_li(source=src)
-        if tickers != None:
-            for ticker_py_ins in tickers:  # return, each instance
+    def run_investipy(cls, src="investipy") -> None:
+        # from instance helper
+        tickers = TickerInstanceHelper.return_ticker_ins_li(
+            source=src
+        )
+        if tickers is not None:
+            for ticker_py_ins in tickers:
                 if type(ticker_py_ins) is InvestipyContainer:
-
-                    if kind == "stock":
-                        ticker_py_ins.get_technical_indicator_to_scv(interval="monthly")
-
-                    elif kind == "technical":
-                        ticker_py_ins.get_technical_to_csv()
-
-                    elif kind == "crypto":
-                        ticker_py_ins.get_crypto_to_csv()
-
-                    elif kind == "efts":
-                        ticker_py_ins.get_etfs_to_csv()
-
-                    elif kind == "commodities":
-                        ticker_py_ins.get_comm_to_csv()
-
-                    else:
-                        raise Exception("Invalid Kind")
+                    match ticker_py_ins.kind:
+                        case "stocks":
+                            ticker_py_ins.get_technical_indicator_to_scv()
+                        case "bonds":
+                            ticker_py_ins.get_technical_to_csv()
+                        case "cryptos":
+                            ticker_py_ins.get_crypto_to_csv()
+                        case "etfs":
+                            ticker_py_ins.get_etfs_to_csv()
+                        case "commodities":
+                            ticker_py_ins.get_comm_to_csv()
+                        case _:
+                            raise Exception("Invalid Kind")
         else:
             raise Exception("Ticker is None")

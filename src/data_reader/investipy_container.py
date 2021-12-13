@@ -1,34 +1,31 @@
 from datetime import date
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Union
 
 import pandas as pd
 from pandas import DataFrame
+
 import investpy
 from investpy.utils.search_obj import SearchObj
 
 from src.utils.time_handler import TimeHandler
-from src.utils.file_handler import FileHandler
+from src.utils.option_container import OptionContainer
 
 
 class InvestipyContainer:
     def __init__(
         self,
         ticker_li: List[str],
-        time_data: Dict[str, Any],
-        products: Optional[List[str]] = None,
-        country: Optional[List[str]] = None,
-        n_result: Optional[int] = None,
+        time_data: Dict[str, Union[str, int]],
+        kind: str,
+        interval: str,
+        country: List[str] = ["united states"],
+        n_result: int = 1,
     ):
-        self.ticker_li = ticker_li
-
-        if country is None:
-            self.country = ["united states"]
-
-        if products is None:
-            self.products = ["stocks"]
-
-        if n_result is None:
-            self.n_result = 1
+        self.__ticker_li = ticker_li
+        self.__kind = kind
+        self.__interval = interval
+        self.__country = country
+        self.__n_result = n_result
 
         if time_data.get("before") is not None:
             self.__start = TimeHandler(time_data).start
@@ -55,38 +52,29 @@ class InvestipyContainer:
         self.__start = f"{sd}/{sm}/{sy}"
         self.__end = f"{ed}/{em}/{ey}"
 
+        self.__loc = OptionContainer.save_path()
+
     @property
-    def starting_date(self) -> Union[date, str]:
+    def starting_date(self) -> date | str:
         return self.__start
 
     @property
-    def ending_date(self) -> Union[date, str]:
+    def ending_date(self) -> date | str:
         return self.__end
 
-    def container(self) -> List[Any]:
-        quotes: List[Any] = []
-        for ticker in self.ticker_li:
-            quotes.append(
-                investpy.search_quotes(
-                    text=ticker,
-                    products=self.products,
-                    countries=self.country,
-                    n_results=self.n_result,
-                )
-            )
-        return quotes
+    @property
+    def kind(self) -> str:
+        return self.__kind
 
-    def get_historical_data(self) -> None:
-        for tickers in self.ticker_li:
-            country = self.country[0]
-            df = investpy.get_stock_historical_data(
-                stock=tickers,
-                country=country,
-                from_date=self.__start,
-                to_date=self.__end,
-            )
-            print(df)  # todo
+    def __str__(self):
+        return f"{self.__ticker_li}\n{self.__kind}\n{self.__interval}\n{self.__start}\n{self.__end}"
 
+    # df helper
+    def save_to_csv(self, df: DataFrame, file_name: str, desc: str):
+        df.to_csv(f"{self.__loc}\\{file_name}_{desc}.csv")
+        print(f"Ticker {self.__start}-{self.__end}: {file_name} downloaded")
+
+    # technical indicator
     @staticmethod
     def get_info(elem: SearchObj) -> DataFrame:
         info_dict: Dict[str, Any] = elem.retrieve_information()  # return dict
@@ -100,30 +88,57 @@ class InvestipyContainer:
         return df
 
     @staticmethod
-    def get_technical_info(elem: SearchObj, interval: str) -> DataFrame:
-        df: DataFrame = elem.retrieve_technical_indicators(
-            interval=interval
-        )  # return dataframes
+    def technical_info(elem: SearchObj, interval: str) -> DataFrame:
+        df: DataFrame = elem.retrieve_technical_indicators(interval=interval)
         return df
 
-    def get_technical_indicator_to_scv(self, interval: str) -> None:
-        loc = FileHandler.get_save_path()
-        for elem in self.container():
-            info_df = self.get_info(elem=elem)
-            technical_df = self.get_technical_info(elem=elem, interval=interval)
+    def get_list_from_investpy_quotes(self) -> List[Any]:
+        quotes: List[Any] = []
+        for ticker in self.__ticker_li:
+            quotes.append(
+                investpy.search_quotes(
+                    text=ticker,
+                    products=[self.__kind],
+                    countries=self.__country,
+                    n_results=self.__n_result,
+                )
+            )
+        return quotes
+
+    def get_technical_indicator_to_scv(self) -> None:
+        for e in self.get_list_from_investpy_quotes():
+            info_df = self.get_info(elem=e)
+            technical_df = self.technical_info(elem=e, interval=self.__interval)
             combined_df: DataFrame = pd.concat(
                 [info_df, technical_df], ignore_index=True
             )
-            combined_df.to_csv(f"{loc}\\{elem.name}'s_info_with_Technical_info.csv")
-            print(f"Technical_info: {elem.name} downloaded")
+            self.save_to_csv(
+                df=combined_df, file_name=e.name, desc="technical_indicator"
+            )
+
+    # technical idx
+    def technical_container(self):
+        pass
 
     def get_technical_to_csv(self):
+        pass
+
+    # crypto
+    def crypto_container(self):
         pass
 
     def get_crypto_to_csv(self):
         pass
 
+    # etfs
+    def etfs_container(self):
+        pass
+
     def get_etfs_to_csv(self):
+        pass
+
+    # commodities
+    def commodities_container(self):
         pass
 
     def get_comm_to_csv(self):

@@ -1,4 +1,3 @@
-import os
 import time
 from typing import Any, List, Optional, Union
 from datetime import date
@@ -6,20 +5,11 @@ from datetime import date
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 
-from scraper.fb_posting_date_helper import return_delta
-
-
-SAVE_DIR = r"finance_data_getter\files"
+from src.scraper.fb_posting_date_helper import return_delta
+from src.utils.option_container import OptionContainer
 
 
 class FileHandler:
-    @classmethod
-    def get_save_path(cls, folder_name: str = SAVE_DIR) -> str:
-        curr = os.getcwd()
-        root = os.path.dirname(curr)
-        stored_file_loc = os.path.join(root, folder_name)
-        return stored_file_loc
-
     @classmethod
     def make_file(
         cls,
@@ -30,7 +20,7 @@ class FileHandler:
         idx: Optional[int] = None,
     ) -> None:
 
-        stored_file_loc = FileHandler.get_save_path(file_name)
+        stored_file_loc = OptionContainer.save_path(file_name)
         delta = return_delta(posting_date)
 
         if idx is not None and delta is not None:
