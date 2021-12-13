@@ -10,7 +10,6 @@ from investpy.utils.search_obj import SearchObj
 from src.utils.time_handler import TimeHandler
 from src.utils.option_container import OptionContainer
 
-
 class InvestipyContainer:
     def __init__(
         self,

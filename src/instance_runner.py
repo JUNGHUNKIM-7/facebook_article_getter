@@ -93,7 +93,7 @@ class InstanceRunner:
     @classmethod
     def run_data_reader(cls, src="pds") -> None:
         tickers = TickerInstanceHelper.return_ticker_ins_li(source=src)
-        if tickers != None:
+        if tickers is not None:
             for ticker_ins in tickers:
                 if type(ticker_ins) is DataReaderContainer:
                     ticker_ins.save_to_csv()

@@ -1,5 +1,5 @@
 import time
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Any
 from datetime import date
 
 import pandas as pd
@@ -7,7 +7,6 @@ from pandas import DataFrame
 import pandas_datareader as pdr
 
 from src.utils.time_handler import TimeHandler
-from src.utils.file_handler import FileHandler
 from src.utils.option_container import OptionContainer
 
 

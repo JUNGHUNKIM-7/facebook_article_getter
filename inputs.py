@@ -23,18 +23,27 @@ news = {
     },
 }
 # indices, stocks, etfs, funds, commodities, currencies, cryptos, bonds, certificates, fxfutures
-tickers = {
+investpy_tickers = {
     "group1": {
         "source": "yahoo",
         "tickers_group": ["AMZN", "AAPL"],
         "kind": "stocks",
         "interval": "daily",
     },
+}
+
+datareader_tickers = {
+    "group1": {"source": "yahoo", "tickers_group": ["AMZN", "AAPL"]},
     "group2": {"source": "naver", "tickers_group": ["005930", "035720"]},
     "group3": {"source": "naver", "tickers_group": ["000660", "066570"]},
 }
 
-time_set = {
+
+investpy_time_set = {
+    "set1": {"before": 10, "base": str(date.today()), "after": 10},
+}
+
+datareader_time_set = {
     "set1": {"before": 10, "base": str(date.today()), "after": 10},
     "set2": {"before": 10, "base": "2020-05-05"},
     "set3": {"base": "2020-05-05", "after": 3},
