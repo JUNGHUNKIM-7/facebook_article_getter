@@ -1,5 +1,6 @@
 import os
 
+
 class OptionContainer:
     # tickers
     PARSE_TICKER = True
@@ -9,8 +10,8 @@ class OptionContainer:
     HEAD_LESS = True
     BROWSER_STATUS = True
 
-    # Investipy
-    RUN_INVESTIPY = True
+    # investpy
+    RUN_investpy = True
 
     SAVE_DIR = r"finance_data_getter\files"
 
@@ -61,9 +62,9 @@ class OptionContainer:
             return OptionContainer.BROWSER_STATUS
 
     @classmethod
-    def set_investipy(cls, run: bool = RUN_INVESTIPY) -> bool:
+    def set_investpy(cls, run: bool = RUN_investpy) -> bool:
         if run is False:
-            OptionContainer.RUN_INVESTIPY = run
-            return OptionContainer.RUN_INVESTIPY
+            OptionContainer.RUN_investpy = run
+            return OptionContainer.RUN_investpy
         else:
-            return OptionContainer.RUN_INVESTIPY
+            return OptionContainer.RUN_investpy

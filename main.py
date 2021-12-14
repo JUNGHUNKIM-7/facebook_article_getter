@@ -6,7 +6,7 @@ from src.utils.option_container import OptionContainer
 class Options(Enum):
     RUN_FB=auto()
     PARSE_TICKER=auto()
-    RUN_INVESTIPY=auto()
+    RUN_investpy=auto()
 
 def runOptions(options: Options, **kwarg):
     match options:
@@ -40,16 +40,16 @@ def runOptions(options: Options, **kwarg):
             OptionContainer.set_data_reader(run=kwarg.get('run',None))
             if OptionContainer.PARSE_TICKER is True:
                 InstanceRunner.run_data_reader()
-        case Options.RUN_INVESTIPY:
-            OptionContainer.set_investipy(run=kwarg.get('run',None))
-            if OptionContainer.RUN_INVESTIPY is True:
-                InstanceRunner.run_investipy()
+        case Options.RUN_investpy:
+            OptionContainer.set_investpy(run=kwarg.get('run',None))
+            if OptionContainer.RUN_investpy is True:
+                InstanceRunner.run_investpy()
         case _:
             Exception("Not Implemented")
 
 
 if __name__ == "__main__":
     try:
-        runOptions(Options.RUN_INVESTIPY, run=True)
+        runOptions(Options.RUN_investpy, run=True)
     except:
         raise Exception("Not Implemented")

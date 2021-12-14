@@ -1,7 +1,7 @@
 from typing import Optional, Union, Dict
-from src.data_reader.investipy_container import InvestipyContainer
-from src.data_reader.data_reader_container import DataReaderContainer
 
+from src.data_reader.investpy_container import InvestpyContainer, SearchTypes
+from src.data_reader.data_reader_container import DataReaderContainer
 from src.utils.option_container import OptionContainer
 from src.data_reader.instance_helper import TickerInstanceHelper
 from src.scraper.fb_controller import FacebookController
@@ -92,30 +92,30 @@ class InstanceRunner:
 
     @classmethod
     def run_data_reader(cls, src="pds") -> None:
-        tickers = TickerInstanceHelper.return_ticker_ins_li(source=src)
+        tickers = TickerInstanceHelper.make_instance_list(source=src)
         if tickers is not None:
             for ticker_ins in tickers:
                 if type(ticker_ins) is DataReaderContainer:
                     ticker_ins.save_to_csv()
 
     @classmethod
-    def run_investipy(cls, src="investipy") -> None:
-        # from instance helper
-        tickers = TickerInstanceHelper.return_ticker_ins_li(
+    def run_investpy(cls, src="investpy") -> None:
+        tickers = TickerInstanceHelper.make_instance_list(
             source=src
         )
         if tickers is not None:
+            print(f'{len(tickers)} will be implemented')
             for ticker_py_ins in tickers:
-                if type(ticker_py_ins) is InvestipyContainer:
-                    match ticker_py_ins.kind:
+                if type(ticker_py_ins) is InvestpyContainer:
+                    match ticker_py_ins.sector:
                         case "stocks":
-                            ticker_py_ins.get_technical_indicator_to_scv()
-                        case "bonds":
-                            ticker_py_ins.get_technical_to_csv()
+                            ticker_py_ins.technical_indicator_to_csv()
+                        case "stock":
+                            ticker_py_ins.get_technical_idx()
                         case "cryptos":
-                            ticker_py_ins.get_crypto_to_csv()
+                            ticker_py_ins.get_crypto_info(type=SearchTypes.GET_INFO)
                         case "etfs":
-                            ticker_py_ins.get_etfs_to_csv()
+                            ticker_py_ins.get_crypto_quotes()
                         case "commodities":
                             ticker_py_ins.get_comm_to_csv()
                         case _:
