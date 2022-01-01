@@ -1,9 +1,8 @@
-from typing import Dict, List, Union, Any
+from typing import  Union, Any
 from bs4 import BeautifulSoup
 import requests as r
 
-from src.utils.option_container import OptionContainer
-
+from options import OptionContainer
 
 class SoupController:
     headers = {
@@ -23,7 +22,7 @@ class SoupController:
         with open(fr'{stored_loc}\page.html', 'w', encoding='utf-8') as f:
             f.write(self.soup.prettify())
 
-    def get_elem(self, tag: Union[str, List[str]], attribute_dict: Dict[str, Any], find_all: bool = False):
+    def get_elem(self, tag: Union[str, list[str]], attribute_dict: dict[str, Any], find_all: bool = False):
         def return_attrs():
             for key, val in attribute_dict.items():
                 return {key: val}

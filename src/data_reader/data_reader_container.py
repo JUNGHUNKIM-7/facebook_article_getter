@@ -1,19 +1,20 @@
 import time
-from typing import List, Dict, Any
+from typing import Any
+from datetime import date
 from datetime import date
 
 import pandas as pd
 from pandas import DataFrame
 import pandas_datareader as pdr
-
+from options import OptionContainer
 from src.utils.time_handler import TimeHandler
-from src.utils.option_container import OptionContainer
-
 
 class DataReaderContainer:
-    def __init__(self, source: str, ticker_li: List[str], time_data: Dict[str, Any]):
+    def __init__(self, source: str, ticker_li: list[str], time_data: dict[str, Any]):
         self.__source = source
         self.__ticker_li = ticker_li
+        self.__ticker_li = ticker_li
+
         if time_data.get("before") is not None:
             self.__start = TimeHandler(time_data).start
         else:
@@ -39,14 +40,16 @@ class DataReaderContainer:
     @staticmethod
     def handle_csv(
         df: DataFrame,
-        new_cols: List[str],
+        new_cols: list[str],
         file_loc: str,
         ticker: str,
         start: date,
         end: date,
     ):
         column_set = zip(df.columns, new_cols)
-        [df.rename(columns={old: new}, inplace=True) for old, new in column_set]
+        for old, new in column_set:
+            df.rename(columns={old: new}, inplace=True)
+
         df = df.round(decimals=3)
 
         df.set_index("일자", inplace=True)
@@ -57,7 +60,8 @@ class DataReaderContainer:
         file_loc = OptionContainer.save_path()
         for ticker in self.__ticker_li:
             if self.__source == "yahoo":
-                df = pdr.DataReader(ticker, self.__source, self.__start, self.__end)
+                df = pdr.DataReader(ticker, self.__source,
+                                    self.__start, self.__end)
                 time.sleep(1)
                 df: DataFrame = pd.DataFrame(df)
 
@@ -94,7 +98,8 @@ class DataReaderContainer:
                 )
 
             if self.__source == "naver":
-                df = pdr.DataReader(ticker, self.__source, self.__start, self.__end)
+                df = pdr.DataReader(ticker, self.__source,
+                                    self.__start, self.__end)
                 time.sleep(1)
                 df: DataFrame = pd.DataFrame(df)
 
@@ -106,7 +111,8 @@ class DataReaderContainer:
                 ].astype(int)
 
                 df["shifted"] = df["Close"].shift(periods=1)
-                df["전일대비종가(%)"] = ((df["Close"] - df["shifted"]) / df["shifted"]) * 100
+                df["전일대비종가(%)"] = (
+                    (df["Close"] - df["shifted"]) / df["shifted"]) * 100
                 df.drop(columns="shifted", inplace=True)
                 new_cols = ["일자", "시작가", "일별최고가", "일별최저가", "종가", "거래량"]
 

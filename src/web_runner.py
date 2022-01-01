@@ -1,19 +1,17 @@
-from typing import Optional, Union, Dict
+from typing import Optional, Union
+from options import OptionContainer
 
-from src.data_reader.investpy_container import InvestpyContainer, SearchTypes
-from src.data_reader.data_reader_container import DataReaderContainer
-from src.utils.option_container import OptionContainer
-from src.data_reader.instance_helper import TickerInstanceHelper
 from src.scraper.fb_controller import FacebookController
 from src.scraper.soup_controller import SoupController
 
-class InstanceRunner:
+
+class WebRunner:
     @classmethod
     def make_instance(
         cls,
         key: str,
         news_channel: Optional[str] = None,
-        options: Dict[str, bool] = None,
+        options: dict[str, bool] = None,
         **kwargs,
     ) -> Union[FacebookController, SoupController, None]:
         obj = kwargs.get(key)
@@ -26,7 +24,8 @@ class InstanceRunner:
         if obj != None:
             if key == "facebook":
                 key_li = ["url", "person_name", "person_info"]
-                url, person_name, person_info = [obj.get(key) for key in key_li]
+                url, person_name, person_info = [
+                    obj.get(key) for key in key_li]
                 return FacebookController(
                     loc=url,
                     person_name=person_name,
@@ -89,36 +88,3 @@ class InstanceRunner:
             instance.get_html()
         except Exception as e:
             print(e)
-
-    @classmethod
-    def run_data_reader(cls, src="pds") -> None:
-        tickers = TickerInstanceHelper.make_instance_list(source=src)
-        if tickers is not None:
-            for ticker_ins in tickers:
-                if type(ticker_ins) is DataReaderContainer:
-                    ticker_ins.save_to_csv()
-
-    @classmethod
-    def run_investpy(cls, src="investpy") -> None:
-        tickers = TickerInstanceHelper.make_instance_list(
-            source=src
-        )
-        if tickers is not None:
-            print(f'{len(tickers)} will be implemented')
-            for ticker_py_ins in tickers:
-                if type(ticker_py_ins) is InvestpyContainer:
-                    match ticker_py_ins.sector:
-                        case "stocks":
-                            ticker_py_ins.technical_indicator_to_csv()
-                        case "stock":
-                            ticker_py_ins.get_technical_idx()
-                        case "cryptos":
-                            ticker_py_ins.get_crypto_info(type=SearchTypes.GET_INFO)
-                        case "etfs":
-                            ticker_py_ins.get_crypto_quotes()
-                        case "commodities":
-                            ticker_py_ins.get_comm_to_csv()
-                        case _:
-                            raise Exception("Invalid Kind")
-        else:
-            raise Exception("Ticker is None")

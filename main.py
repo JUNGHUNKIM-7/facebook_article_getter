@@ -1,16 +1,12 @@
-from enum import Enum,auto
+from options import OptionContainer, RunOptions
 
-from src.instance_runner import InstanceRunner
-from src.utils.option_container import OptionContainer
+from src.web_runner import WebRunner
+from src.finance_data_runner import FinanceRunner
 
-class Options(Enum):
-    RUN_FB=auto()
-    PARSE_TICKER=auto()
-    RUN_investpy=auto()
 
-def runOptions(options: Options, **kwarg):
+def runOptions(options: RunOptions, **kwarg):
     match options:
-        case Options.RUN_FB:
+        case RunOptions.RUN_FB:
             pass
             # OptionContainer.set_headless(headless=kwarg.get('headless',None))
             # OptionContainer.set_kill_browser(kill=kwarg.get('kill',None))
@@ -36,20 +32,20 @@ def runOptions(options: Options, **kwarg):
             #         )
             #         if news_ins is not None and type(news_ins) is InstanceRunner:
             #             InstanceRunner.run_news(instance=news_ins)
-        case Options.PARSE_TICKER:
-            OptionContainer.set_data_reader(run=kwarg.get('run',None))
+        case RunOptions.RUN_TICKER:
+            OptionContainer.set_data_reader(run=kwarg.get('run', None))
             if OptionContainer.PARSE_TICKER is True:
-                InstanceRunner.run_data_reader()
-        case Options.RUN_investpy:
-            OptionContainer.set_investpy(run=kwarg.get('run',None))
-            if OptionContainer.RUN_investpy is True:
-                InstanceRunner.run_investpy()
+                FinanceRunner.run_data_reader()
+        case RunOptions.RUN_INVESTPY:
+            OptionContainer.set_investpy(run=kwarg.get('run', None))
+            if OptionContainer.RUN_INVESTPY is True:
+                FinanceRunner.run_investpy()
         case _:
-            Exception("Not Implemented")
+            raise Exception("Not Implemented")
 
 
 if __name__ == "__main__":
     try:
-        runOptions(Options.RUN_investpy, run=True)
+        runOptions(RunOptions.RUN_INVESTPY, run=True)
     except:
         raise Exception("Not Implemented")

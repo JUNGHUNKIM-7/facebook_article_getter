@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Iterator, Optional, Union, List, Tuple, Dict
+from typing import Iterator, Optional, Union,  Tuple
 
 from dotenv import load_dotenv
 from selenium import webdriver as driver
@@ -24,7 +24,7 @@ class FacebookController(driver.Firefox):
         person_name: str,
         person_info: Optional[str] = None,
         driver_path: str = r"data_getter\geckodriver.exe",
-        options: Optional[Dict[str, bool]] = None,
+        options: Optional[dict[str, bool]] = None,
     ):
 
         os.environ["PATH"] += driver_path
@@ -39,7 +39,8 @@ class FacebookController(driver.Firefox):
 
         if self.__headless:
             FacebookController.OPS.headless = self.__headless
-            super(FacebookController, self).__init__(options=FacebookController.OPS)
+            super(FacebookController, self).__init__(
+                options=FacebookController.OPS)
         else:
             super(FacebookController, self).__init__()
 
@@ -65,7 +66,8 @@ class FacebookController(driver.Firefox):
         btn.click()
 
     def search_person(self) -> None:
-        search_bar = self.find_element(By.CSS_SELECTOR, 'input[spellcheck="false"]')
+        search_bar = self.find_element(
+            By.CSS_SELECTOR, 'input[spellcheck="false"]')
         search_bar.click()
         search_bar.send_keys(self.person_name)
         time.sleep(2)
@@ -98,7 +100,8 @@ class FacebookController(driver.Firefox):
             "2013": 8,
             "2012": 9,
         }
-        options_wrapper = self.find_element(By.CSS_SELECTOR, wrapper_css_selector)
+        options_wrapper = self.find_element(
+            By.CSS_SELECTOR, wrapper_css_selector)
 
         # todo 2021 제외하고는 작동안됨
         for key in year_dict.keys():
@@ -121,7 +124,8 @@ class FacebookController(driver.Firefox):
             a.click()
             time.sleep(1)
 
-            switch = self.find_element(By.CSS_SELECTOR, 'input[aria-label="최근 게시물"]')
+            switch = self.find_element(
+                By.CSS_SELECTOR, 'input[aria-label="최근 게시물"]')
             switch.click()
             time.sleep(1)
 
@@ -131,7 +135,8 @@ class FacebookController(driver.Firefox):
             year_selection.click()
             time.sleep(1)
 
-            self.year_selector(year=year, wrapper_css_selector='div[role="listbox"]')
+            self.year_selector(
+                year=year, wrapper_css_selector='div[role="listbox"]')
         elif year and search_keyword:
             time.sleep(1)
             btn = self.find_element(
@@ -154,20 +159,23 @@ class FacebookController(driver.Firefox):
             switch = div.find_element(By.TAG_NAME, "input")
             switch.click()
 
-            year_selection_wrapper = self.find_elements(By.CLASS_NAME, "lwwyvkzy")[1]
+            year_selection_wrapper = self.find_elements(
+                By.CLASS_NAME, "lwwyvkzy")[1]
             year_selection = year_selection_wrapper.find_elements(
                 By.CSS_SELECTOR, 'div[role="combobox"]'
             )[1]
             year_selection.click()
             time.sleep(1)
 
-            self.year_selector(year=year, wrapper_css_selector='div[role="listbox"]')
+            self.year_selector(
+                year=year, wrapper_css_selector='div[role="listbox"]')
         else:
             a = self.find_element(By.CSS_SELECTOR, 'a[href^="/search/posts"]')
             a.click()
             time.sleep(1)
 
-            switch = self.find_element(By.CSS_SELECTOR, 'input[aria-label="최근 게시물"]')
+            switch = self.find_element(
+                By.CSS_SELECTOR, 'input[aria-label="최근 게시물"]')
             switch.click()
 
     def bottom_end(self, drag_count_or_infinite: Union[int, bool]):
@@ -195,7 +203,7 @@ class FacebookController(driver.Firefox):
 
     @staticmethod
     def make_wrapper_generator(
-        web_elements: List[WebElement], dates: Optional[List[WebElement]] = None
+        web_elements: list[WebElement], dates: Optional[list[WebElement]] = None
     ) -> Iterator[Union[Tuple[int, WebElement, WebElement], Tuple[int, WebElement]]]:
         if dates:
             for (i, wrapper_elem), date in zip(enumerate(web_elements), dates):
@@ -220,7 +228,8 @@ class FacebookController(driver.Firefox):
                 wrappers = feed.find_elements(
                     By.CSS_SELECTOR, 'div[data-ad-comet-preview="message"]'
                 )
-                links = feed.find_elements(By.CSS_SELECTOR, 'a[aria-label*="일"]')
+                links = feed.find_elements(
+                    By.CSS_SELECTOR, 'a[aria-label*="일"]')
                 missing_btn = 0
 
                 # generator
@@ -240,7 +249,8 @@ class FacebookController(driver.Firefox):
                             self.position_to_base(element=wrapper)
 
                             button_check = len(
-                                wrapper.find_elements(By.CSS_SELECTOR, 'div[role="button"]')
+                                wrapper.find_elements(
+                                    By.CSS_SELECTOR, 'div[role="button"]')
                             )
 
                             if button_check == 0:
@@ -271,7 +281,8 @@ class FacebookController(driver.Firefox):
             #     )
 
             elif year and search_keyword:
-                wrappers = self.find_elements(By.CSS_SELECTOR, 'div[role="article"]')
+                wrappers = self.find_elements(
+                    By.CSS_SELECTOR, 'div[role="article"]')
                 keyword_wrapper_gen = FacebookController.make_wrapper_generator(
                     web_elements=wrappers
                 )
@@ -337,7 +348,8 @@ class FacebookController(driver.Firefox):
                             )
 
                             for post in posts:
-                                data.append(post.get_attribute("innerText").strip())
+                                data.append(post.get_attribute(
+                                    "innerText").strip())
 
                             # parsing and save files
                             print(f"Start Scraping {i + 1}")
@@ -358,6 +370,7 @@ class FacebookController(driver.Firefox):
                 print(f"Wrapper: {scrape_count} are totally saved")
 
             else:
-                raise Exception("Year or Search should be passed to filter posts")
+                raise Exception(
+                    "Year or Search should be passed to filter posts")
         except Exception as e:
             raise e

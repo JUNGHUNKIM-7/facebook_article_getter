@@ -1,4 +1,29 @@
+from enum import Enum, auto
 import os
+
+
+class RunOptions(Enum):
+    RUN_FB = auto()
+    RUN_TICKER = auto()
+    RUN_INVESTPY = auto()
+
+
+class SearchTypes(Enum):
+    GET_CRYPTO_LIST = auto()
+    GET_CRYPTO_OVERVIEW = auto()
+    GET_CRYPTO_INFO = auto()
+    GET_CRYPTO_HISTORICAL = auto()
+
+    GET_ETF_LIST = auto()
+    GET_ETF_COUNTRIES = auto()
+    GET_ETF_INFO = auto()
+    GET_ETF_HISTORICAL = auto()
+
+    GET_COMMO_INFO = auto()
+    GET_COMMO_LIST = auto()
+    GET_COMMO_BY_GROUP = auto()
+    GET_COMMO_OVERVIEW_BY_GROUP = auto()
+    GET_COMMO_HISTORICAL = auto()
 
 
 class OptionContainer:
@@ -11,7 +36,7 @@ class OptionContainer:
     BROWSER_STATUS = True
 
     # investpy
-    RUN_investpy = True
+    RUN_INVESTPY = True
 
     SAVE_DIR = r"finance_data_getter\files"
 
@@ -62,9 +87,9 @@ class OptionContainer:
             return OptionContainer.BROWSER_STATUS
 
     @classmethod
-    def set_investpy(cls, run: bool = RUN_investpy) -> bool:
+    def set_investpy(cls, run: bool = RUN_INVESTPY) -> bool:
         if run is False:
-            OptionContainer.RUN_investpy = run
-            return OptionContainer.RUN_investpy
+            OptionContainer.RUN_INVESTPY = run
+            return OptionContainer.RUN_INVESTPY
         else:
-            return OptionContainer.RUN_investpy
+            return OptionContainer.RUN_INVESTPY

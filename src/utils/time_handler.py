@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta, date
-from typing import Dict, Any
+from typing import Any
 
 
 class TimeHandler:
-    def __init__(self, time_val: Dict[str, Any]) -> None:
+    def __init__(self, time_val: dict[str, Any]) -> None:
         self.__starting = time_val.get("before")
         self.__ending = time_val.get("after")
 
@@ -57,5 +57,5 @@ class TimeHandler:
     def today(self) -> date:
         return self.__today
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Starting: {self.start} & base : {self.start} & Ending: {self.end} "

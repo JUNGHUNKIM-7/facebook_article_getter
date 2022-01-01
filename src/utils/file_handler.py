@@ -1,19 +1,18 @@
 import time
-from typing import Any, List, Optional, Union
+from typing import Any,  Optional, Union
 from datetime import date
 
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
+from options import OptionContainer
 
 from src.scraper.fb_posting_date_helper import return_delta
-from src.utils.option_container import OptionContainer
-
 
 class FileHandler:
     @classmethod
     def make_file(
         cls,
-        articles: List[str],
+        articles: list[str],
         posting_date: str,
         kind: str,
         file_name,
@@ -36,7 +35,7 @@ class FileHandler:
     def get_data_as_file(
         cls,
         i: int,
-        web_elems_or_data_list: Union[WebElement, List[str]],
+        web_elems_or_data_list: Union[WebElement, list[str]],
         post_date: Union[WebElement, str],
         file_name: str,
         kind: str,
@@ -45,7 +44,7 @@ class FileHandler:
             if type(web_elems_or_data_list) is WebElement:
                 article_list = []
                 date_data = ""
-                divs: List[WebElement] = web_elems_or_data_list.find_elements(
+                divs: list[WebElement] = web_elems_or_data_list.find_elements(
                     By.CSS_SELECTOR, 'div[style="text-align: start;"]'
                 )
 
@@ -58,7 +57,8 @@ class FileHandler:
                 if len(divs) != 0:
                     for div in divs:
                         time.sleep(0.5)
-                        article_list.append(div.get_attribute("innerHTML").strip())
+                        article_list.append(
+                            div.get_attribute("innerHTML").strip())
 
                 FileHandler.make_file(
                     articles=article_list,
@@ -69,7 +69,7 @@ class FileHandler:
                 )
 
             else:
-                if type(web_elems_or_data_list) is List[str] and type(post_date) is str:
+                if type(web_elems_or_data_list) is list[str] and type(post_date) is str:
                     FileHandler.make_file(
                         articles=web_elems_or_data_list,
                         posting_date=post_date,
